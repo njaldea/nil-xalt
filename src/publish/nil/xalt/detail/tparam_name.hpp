@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Literal.hpp"
+#include "../literal.hpp"
 
+#include <span>
 #include <string_view>
 
 namespace nil::xalt::detail
@@ -21,6 +22,6 @@ namespace nil::xalt::detail
         );
 
         // +1 is for the null character
-        return TPLiteral<pos2 - pos1 + 1>(str);
+        return tp_literal<pos2 - pos1 + 1>(str);
     }
 }

@@ -1,20 +1,21 @@
+#include "nil/xalt/literal.hpp"
 #include <nil/xalt.hpp>
-#include <nil/xalt/Literal.hpp>
-#include <nil/xalt/TypeName.hpp>
-#include <nil/xalt/ValueName.hpp>
 #include <nil/xalt/enum_name.hpp>
 #include <nil/xalt/fsign.hpp>
+#include <nil/xalt/type_id.hpp>
+#include <nil/xalt/type_name.hpp>
+#include <nil/xalt/value_name.hpp>
 
 #include <functional>
 #include <iostream>
 #include <string_view>
 
-template <nil::xalt::TPLiteral T>
+template <nil::xalt::tp_literal T>
 struct MyType
 {
     std::string_view get_value()
     {
-        return nil::xalt::Literal<T>::value;
+        return nil::xalt::literal<T>::value;
     }
 };
 
@@ -87,15 +88,16 @@ struct Woof
 
 int main()
 {
-    using nil::xalt::TPLiteral;
-    using nil::xalt::TypeName;
-    using nil::xalt::ValueName;
+    using nil::xalt::tp_literal;
+    using nil::xalt::type_id;
+    using nil::xalt::type_name;
+    using nil::xalt::value_name;
 
     using type = MyType<nil::xalt::concat("Hello", " ", "World", " ", "wtf")>;
     std::cout << type().get_value() << std::endl;
-    std::cout << TypeName<type>::value << std::endl;
-    std::cout << ValueName<TPLiteral("asd")>::value << std::endl;
-    std::cout << ValueName<Zip::ABC>::value << std::endl;
+    std::cout << type_name<type>::value << std::endl;
+    std::cout << value_name<tp_literal("asd")>::value << std::endl;
+    std::cout << value_name<Zip::ABC>::value << std::endl;
     std::cout << enum_name(Zip::DEF) << std::endl;
 
     check<false>(&foo);

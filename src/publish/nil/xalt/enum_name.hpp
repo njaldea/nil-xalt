@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ValueName.hpp"
+#include "value_name.hpp"
 
 #include <string_view>
 
@@ -11,7 +11,7 @@ namespace nil::xalt
     {
         if (value == First)
         {
-            return ValueName<First>::value;
+            return value_name_v<First>;
         }
         if constexpr (sizeof...(Rest) > 0)
         {

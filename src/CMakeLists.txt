@@ -6,9 +6,10 @@ set(
         publish/nil/xalt/enum_name.hpp
         publish/nil/xalt/errors.hpp
         publish/nil/xalt/fsign.hpp
-        publish/nil/xalt/Literal.hpp
-        publish/nil/xalt/TypeName.hpp
-        publish/nil/xalt/ValueName.hpp
+        publish/nil/xalt/literal.hpp
+        publish/nil/xalt/type_name.hpp
+        publish/nil/xalt/value_name.hpp
+        publish/nil/xalt/type_id.hpp
         publish/nil/xalt/detail/tparam_name.hpp
 )
 

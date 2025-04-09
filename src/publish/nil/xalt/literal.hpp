@@ -6,25 +6,25 @@
 namespace nil::xalt
 {
     template <std::size_t N>
-    struct TPLiteral final
+    struct tp_literal final
     {
     public:
         // NOLINTNEXTLINE
-        consteval TPLiteral(std::span<const char> init_value)
+        consteval tp_literal(std::span<const char> init_value)
         {
             copy_n(init_value.data(), N - 1, &value[0]);
             value[N - 1] = '\0';
         }
 
         // NOLINTNEXTLINE
-        consteval TPLiteral(const char (&init_value)[N])
+        consteval tp_literal(const char (&init_value)[N])
         {
             copy_n(&init_value[0], N, &value[0]);
         }
 
         template <std::size_t M, std::size_t... Rest>
         // NOLINTNEXTLINE
-        consteval TPLiteral(const char (&init_value_l)[M], const char (&... init_value_r)[Rest])
+        consteval tp_literal(const char (&init_value_l)[M], const char (&... init_value_r)[Rest])
         {
             auto it = copy_n(&init_value_l[0], M - 1, &value[0]);
             (..., (it = copy_n(&init_value_r[0], Rest - 1, it)));
@@ -50,12 +50,15 @@ namespace nil::xalt
     {
         constexpr auto size = (N + ... + Rest) - sizeof...(Rest);
         static_assert(size > 0, "Invalid size for concatenation");
-        return TPLiteral<size>(l, rest...);
+        return tp_literal<size>(l, rest...);
     }
 
-    template <TPLiteral T>
-    struct Literal final
+    template <tp_literal T>
+    struct literal final
     {
         static constexpr auto value = T.value;
     };
+
+    template <tp_literal T>
+    static constexpr auto literal_v = literal<T>::value;
 }
