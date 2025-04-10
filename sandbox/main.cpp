@@ -122,6 +122,7 @@ int main()
     bar_check<false, true>(&bar::foo_c);
     bar_check<true, false>(&bar::foo_n);
     bar_check<true, true>(&bar::foo_n_c);
+
     {
         Woof<&bar::foo> w;
         bar b;
@@ -148,7 +149,7 @@ int main()
         static_assert(0b01111 == make_mask(4));
         static_assert(0b11111 == make_mask(5));
         using AA = A<std::string, int, std::string>;
-        nil::xalt::make<AA>("std", true, "hello");
+        nil::xalt::make<AA>("std", true, "hello", "sdsa");
         return 0;
     }
 }

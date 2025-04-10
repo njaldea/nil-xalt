@@ -10,22 +10,14 @@ namespace nil::xalt
 {
     namespace detail
     {
-        constexpr auto make_mask(std::size_t value)
+        consteval auto pow_2(std::size_t value) -> std::size_t
         {
-            if (value == 0)
-            {
-                return 0u;
-            }
-            return 1 << (value - 1) | make_mask(value - 1);
+            return value == 0 ? 0 : 1 << (value - 1);
         }
 
-        constexpr auto pow_2(std::size_t value)
+        consteval auto make_mask(std::size_t value) -> std::size_t
         {
-            if (value == 0)
-            {
-                return 0;
-            }
-            return 1 << (value - 1);
+            return value == 0 ? pow_2(value) : pow_2(value) | make_mask(value - 1);
         }
 
         template <
@@ -79,7 +71,10 @@ namespace nil::xalt
 
                 if constexpr (check_one<A, tlist_types<T...>, masked_type>::value)
                 {
-                    return check_one<A, tlist_types<T...>, masked_type>::create(args...);
+                    if constexpr (!value<M - 1>)
+                    {
+                        return check_one<A, tlist_types<T...>, masked_type>::create(args...);
+                    }
                 }
                 else if constexpr (M > 0)
                 {
