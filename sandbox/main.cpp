@@ -1,7 +1,9 @@
-#include "nil/xalt/literal.hpp"
+#include "nil/xalt/errors.hpp"
 #include <nil/xalt.hpp>
 #include <nil/xalt/enum_name.hpp>
 #include <nil/xalt/fsign.hpp>
+#include <nil/xalt/literal.hpp>
+#include <nil/xalt/make_call.hpp>
 #include <nil/xalt/type_id.hpp>
 #include <nil/xalt/type_name.hpp>
 #include <nil/xalt/value_name.hpp>
@@ -42,7 +44,8 @@ struct bar
 {
     void foo()
     {
-        std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__FUNCTION__) << std::endl;
+        std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__PRETTY_FUNCTION__)
+                  << std::endl;
     }
 
     void foo_c() const;
@@ -86,7 +89,20 @@ struct Woof
     }
 };
 
+#include <string>
+
+template <typename... T>
+struct A
+{
+    explicit A(T... /* t */)
+    {
+        std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__PRETTY_FUNCTION__)
+                  << std::endl;
+    }
+};
+
 int main()
+
 {
     using nil::xalt::tp_literal;
     using nil::xalt::type_id;
@@ -115,5 +131,24 @@ int main()
     {
         Woof<&foo> w;
         w.wtf();
+    }
+
+    {
+        using namespace nil::xalt::detail;
+        static_assert(0b00000 == pow_2(0));
+        static_assert(0b00001 == pow_2(1));
+        static_assert(0b00010 == pow_2(2));
+        static_assert(0b00100 == pow_2(3));
+        static_assert(0b01000 == pow_2(4));
+        static_assert(0b10000 == pow_2(5));
+        static_assert(0b00000 == make_mask(0));
+        static_assert(0b00001 == make_mask(1));
+        static_assert(0b00011 == make_mask(2));
+        static_assert(0b00111 == make_mask(3));
+        static_assert(0b01111 == make_mask(4));
+        static_assert(0b11111 == make_mask(5));
+        using AA = A<std::string, int, std::string>;
+        nil::xalt::make<AA>("std", true, "hello");
+        return 0;
     }
 }

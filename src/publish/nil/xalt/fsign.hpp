@@ -1,10 +1,9 @@
 #pragma once
 
+#include "tlist.hpp"
+
 namespace nil::xalt
 {
-    template <typename... T>
-    struct types;
-
     template <typename T>
     struct fsign final
     {
@@ -20,7 +19,7 @@ namespace nil::xalt
     {
         using class_name = C;
         using return_type = R;
-        using arg_types = types<Args...>;
+        using arg_types = tlist_types<Args...>;
         static constexpr auto is_const = false;
         static constexpr auto is_noexcept = false;
     };
@@ -30,7 +29,7 @@ namespace nil::xalt
     {
         using class_name = C;
         using return_type = R;
-        using arg_types = types<Args...>;
+        using arg_types = tlist_types<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = false;
     };
@@ -40,7 +39,7 @@ namespace nil::xalt
     {
         using class_name = C;
         using return_type = R;
-        using arg_types = types<Args...>;
+        using arg_types = tlist_types<Args...>;
         static constexpr auto is_const = false;
         static constexpr auto is_noexcept = true;
     };
@@ -50,7 +49,7 @@ namespace nil::xalt
     {
         using class_name = C;
         using return_type = R;
-        using arg_types = types<Args...>;
+        using arg_types = tlist_types<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = true;
     };
@@ -60,7 +59,7 @@ namespace nil::xalt
     {
         using class_name = void;
         using return_type = R;
-        using arg_types = types<Args...>;
+        using arg_types = tlist_types<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = false;
     };
@@ -70,7 +69,7 @@ namespace nil::xalt
     {
         using class_name = void;
         using return_type = R;
-        using arg_types = types<Args...>;
+        using arg_types = tlist_types<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = true;
     };

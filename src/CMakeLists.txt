@@ -7,9 +7,11 @@ set(
         publish/nil/xalt/errors.hpp
         publish/nil/xalt/fsign.hpp
         publish/nil/xalt/literal.hpp
+        publish/nil/xalt/make_call.hpp
+        publish/nil/xalt/tlist.hpp
+        publish/nil/xalt/type_id.hpp
         publish/nil/xalt/type_name.hpp
         publish/nil/xalt/value_name.hpp
-        publish/nil/xalt/type_id.hpp
         publish/nil/xalt/detail/tparam_name.hpp
 )
 
