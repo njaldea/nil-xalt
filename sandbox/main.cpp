@@ -1,15 +1,15 @@
-#include "nil/xalt/errors.hpp"
 #include <nil/xalt.hpp>
 #include <nil/xalt/enum_name.hpp>
+#include <nil/xalt/fn_create.hpp>
 #include <nil/xalt/fsign.hpp>
 #include <nil/xalt/literal.hpp>
-#include <nil/xalt/make_call.hpp>
 #include <nil/xalt/type_id.hpp>
 #include <nil/xalt/type_name.hpp>
 #include <nil/xalt/value_name.hpp>
 
 #include <functional>
 #include <iostream>
+#include <string>
 #include <string_view>
 
 template <nil::xalt::tp_literal T>
@@ -89,20 +89,52 @@ struct Woof
     }
 };
 
-#include <string>
+#define PR                                                                                         \
+    std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__PRETTY_FUNCTION__)          \
+              << std::endl
+
+struct B
+{
+    B()
+    {
+        PR;
+    }
+
+    B(const B&)
+    {
+        PR;
+    }
+
+    B(B&&) noexcept
+    {
+        PR;
+    }
+
+    B& operator=(const B& /* b */)
+    {
+        PR;
+        return *this;
+    }
+
+    B& operator=(B&& /* b */) noexcept
+    {
+        PR;
+        return *this;
+    }
+
+    ~B() = default;
+};
 
 template <typename... T>
 struct A
 {
     explicit A(T... /* t */)
     {
-        std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__PRETTY_FUNCTION__)
-                  << std::endl;
+        PR;
     }
 };
 
 int main()
-
 {
     using nil::xalt::tp_literal;
     using nil::xalt::type_id;
@@ -135,6 +167,7 @@ int main()
     }
 
     {
+        using namespace nil::xalt;
         using namespace nil::xalt::detail;
         static_assert(0b00000 == pow_2(0));
         static_assert(0b00001 == pow_2(1));
@@ -148,8 +181,15 @@ int main()
         static_assert(0b00111 == make_mask(3));
         static_assert(0b01111 == make_mask(4));
         static_assert(0b11111 == make_mask(5));
-        using AA = A<std::string, int, std::string>;
-        nil::xalt::make<AA>("std", true, "hello", "sdsa");
+        using AA = A<B&, const B&>;
+        auto b = B();
+        nil::xalt::fn_make<AA>(2, "std", 1, b, B(), "asd", "dsad", "hello");
+        // auto _ = std::make_tuple( //
+        //     nil::xalt::fn_make<AA>(2, "std", 1, "asd", "dsad", "hello"),
+        //     nil::xalt::fn_make_unique<AA>(2, "std", 1, "asd", "dsad", "hello"),
+        //     nil::xalt::fn_make_shared<AA>(2, "std", 1, "asd", "dsad", "hello")
+        // );
+
         return 0;
     }
 }
