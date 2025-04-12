@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <span>
 
 namespace nil::xalt
 {
@@ -10,9 +9,9 @@ namespace nil::xalt
     {
     public:
         // NOLINTNEXTLINE
-        consteval tp_literal(std::span<const char> init_value)
+        consteval tp_literal(const char* init_value, std::size_t offset)
         {
-            copy_n(init_value.data(), N - 1, &value[0]);
+            copy_n(&init_value[offset], N - 1, &value[0]);
             value[N - 1] = '\0';
         }
 

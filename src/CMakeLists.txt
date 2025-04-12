@@ -2,16 +2,16 @@ project(xalt)
 
 set(
     HEADERS
-        publish/nil/xalt.hpp
-        publish/nil/xalt/enum_name.hpp
+        publish/nil/xalt/cast.hpp
+        publish/nil/xalt/concepts.hpp
         publish/nil/xalt/errors.hpp
-        publish/nil/xalt/fsign.hpp
+        publish/nil/xalt/fn_make.hpp
+        publish/nil/xalt/fn_sign.hpp
         publish/nil/xalt/literal.hpp
-        publish/nil/xalt/fn_create.hpp
+        publish/nil/xalt/str_name.hpp
+        publish/nil/xalt/stringify.hpp
         publish/nil/xalt/tlist.hpp
         publish/nil/xalt/type_id.hpp
-        publish/nil/xalt/type_name.hpp
-        publish/nil/xalt/value_name.hpp
         publish/nil/xalt/detail/tparam_name.hpp
 )
 

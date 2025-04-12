@@ -1,21 +1,21 @@
 #pragma once
 
-#include "value_name.hpp"
+#include "str_name.hpp"
 
 #include <string_view>
 
 namespace nil::xalt
 {
-    template <typename T, T First, T... Rest>
-    std::string_view enum_name(T value)
+    template <auto First, decltype(First)... Rest>
+    std::string_view stringify(decltype(First) value)
     {
         if (value == First)
         {
-            return value_name_v<First>;
+            return str_name_value_v<First>;
         }
         if constexpr (sizeof...(Rest) > 0)
         {
-            return enum_name<T, Rest...>(value);
+            return stringify<Rest...>(value);
         }
         else
         {

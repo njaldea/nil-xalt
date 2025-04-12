@@ -5,17 +5,17 @@
 namespace nil::xalt
 {
     template <typename T>
-    struct fsign final
+    struct fn_sign final
     {
-        using class_name = fsign<decltype(&T::operator())>::class_name;
-        using return_type = fsign<decltype(&T::operator())>::return_type;
-        using arg_types = fsign<decltype(&T::operator())>::arg_types;
-        static constexpr auto is_const = fsign<decltype(&T::operator())>::is_const;
-        static constexpr auto is_noexcept = fsign<decltype(&T::operator())>::is_noexcept;
+        using class_name = fn_sign<decltype(&T::operator())>::class_name;
+        using return_type = fn_sign<decltype(&T::operator())>::return_type;
+        using arg_types = fn_sign<decltype(&T::operator())>::arg_types;
+        static constexpr auto is_const = fn_sign<decltype(&T::operator())>::is_const;
+        static constexpr auto is_noexcept = fn_sign<decltype(&T::operator())>::is_noexcept;
     };
 
     template <typename C, typename R, typename... Args>
-    struct fsign<R (C::*)(Args...)> final
+    struct fn_sign<R (C::*)(Args...)> final
     {
         using class_name = C;
         using return_type = R;
@@ -25,7 +25,7 @@ namespace nil::xalt
     };
 
     template <typename C, typename R, typename... Args>
-    struct fsign<R (C::*)(Args...) const> final
+    struct fn_sign<R (C::*)(Args...) const> final
     {
         using class_name = C;
         using return_type = R;
@@ -35,7 +35,7 @@ namespace nil::xalt
     };
 
     template <typename C, typename R, typename... Args>
-    struct fsign<R (C::*)(Args...) noexcept> final
+    struct fn_sign<R (C::*)(Args...) noexcept> final
     {
         using class_name = C;
         using return_type = R;
@@ -45,7 +45,7 @@ namespace nil::xalt
     };
 
     template <typename C, typename R, typename... Args>
-    struct fsign<R (C::*)(Args...) const noexcept> final
+    struct fn_sign<R (C::*)(Args...) const noexcept> final
     {
         using class_name = C;
         using return_type = R;
@@ -55,7 +55,7 @@ namespace nil::xalt
     };
 
     template <typename R, typename... Args>
-    struct fsign<R (*)(Args...)> final
+    struct fn_sign<R (*)(Args...)> final
     {
         using class_name = void;
         using return_type = R;
@@ -65,7 +65,7 @@ namespace nil::xalt
     };
 
     template <typename R, typename... Args>
-    struct fsign<R (*)(Args...) noexcept> final
+    struct fn_sign<R (*)(Args...) noexcept> final
     {
         using class_name = void;
         using return_type = R;
