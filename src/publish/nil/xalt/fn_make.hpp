@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cast.hpp"
-#include "concepts.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -45,24 +44,21 @@ namespace nil::xalt::detail
     template <typename A, typename... Args>
     struct make
     {
-    private:
-        static constexpr auto size = sizeof...(Args);
-
     public:
         static auto call(Args... args)
         {
-            static constexpr auto mask = detail::make_mask(size);
+            static constexpr auto mask = detail::make_mask(sizeof...(Args));
             return apply<mask>(std::forward<Args>(args)...);
         }
 
-        static constexpr bool value
-            = (size < 64) && !std::is_same_v<void, decltype(call(std::declval<Args>()...))>;
+        static constexpr bool value = (sizeof...(Args) < 64)
+            && !std::is_same_v<void, decltype(call(std::declval<Args>()...))>;
 
     private:
         template <std::size_t M>
         static auto apply(Args... args)
         {
-            using masked_type = index_masked_t<M, size>;
+            using masked_type = index_masked_t<M, sizeof...(Args)>;
             constexpr auto is_compatible
                 = !std::is_same_v<void, decltype(create(masked_type(), std::declval<Args>()...))>;
             if constexpr (is_compatible)
@@ -78,26 +74,13 @@ namespace nil::xalt::detail
         template <std::size_t... I>
         static auto create(std::index_sequence<I...> /* i */, Args... args)
         {
+            using element_type = typename A::type;
             const auto t = std::make_tuple(explicit_cast<Args>{&args}...);
-            constexpr auto i = size - 1;
-            if constexpr (requires() { A::element_type; })
+            constexpr auto is_constructible
+                = requires() { element_type(std::get<sizeof...(Args) - I - 1>(t).cast()...); };
+            if constexpr (is_constructible)
             {
-                using element_type = typename A::element_type;
-                if constexpr (is_of_template_v<A, std::unique_ptr>)
-                {
-                    return std::make_unique<element_type>(std::get<i - I>(t).cast()...);
-                }
-                else if constexpr (is_of_template_v<A, std::shared_ptr>)
-                {
-                    return std::make_shared<element_type>(std::get<i - I>(t).cast()...);
-                }
-            }
-            else
-            {
-                if constexpr (requires() { A(std::get<i - I>(t).cast()...); })
-                {
-                    return A(std::get<i - I>(t).cast()...);
-                }
+                return A::make(std::get<sizeof...(Args) - I - 1>(t).cast()...);
             }
         }
     };
@@ -105,36 +88,75 @@ namespace nil::xalt::detail
 
 namespace nil::xalt
 {
+    template <typename A>
+    struct fn_make_strategy
+    {
+        using type = A;
+
+        template <typename... T>
+        static auto make(T&&... args)
+        {
+            return A(std::forward<T>(args)...);
+        }
+    };
+
+    template <typename A>
+    struct fn_make_strategy<std::unique_ptr<A>>
+    {
+        using type = A;
+
+        template <typename... T>
+        static auto make(T&&... args)
+        {
+            return std::make_unique<A>(std::forward<T>(args)...);
+        }
+    };
+
+    template <typename A>
+    struct fn_make_strategy<std::shared_ptr<A>>
+    {
+        using type = A;
+
+        template <typename... T>
+        static auto make(T&&... args)
+        {
+            return std::make_shared<A>(std::forward<T>(args)...);
+        }
+    };
+
     template <typename A, typename... T>
-        requires(!detail::make<A, T && ...>::value)
+        requires(!detail::make<fn_make_strategy<A>, T && ...>::value)
     auto fn_make(T&&... args) = delete;
 
     template <typename A, typename... T>
-        requires(detail::make<A, T && ...>::value)
+        requires(detail::make<fn_make_strategy<A>, T && ...>::value)
     auto fn_make(T&&... args)
     {
-        return detail::make<A, T&&...>::call(std::forward<T>(args)...);
+        using type = detail::make<fn_make_strategy<A>, T&&...>;
+        return type::call(std::forward<T>(args)...);
     }
 
     template <typename A, typename... T>
-        requires(!detail::make<A, T && ...>::value)
+        requires(!detail::make<fn_make_strategy<std::unique_ptr<A>>, T && ...>::value)
     auto fn_make_unique(T&&... args) = delete;
 
     template <typename A, typename... T>
-        requires(detail::make<A, T && ...>::value)
+        requires(detail::make<fn_make_strategy<std::unique_ptr<A>>, T && ...>::value)
     auto fn_make_unique(T&&... args)
     {
-        return detail::make<std::unique_ptr<A>, T&&...>::call(std::forward<T>(args)...);
+        using type = detail::make<fn_make_strategy<std::unique_ptr<A>>, T&&...>;
+        return type::call(std::forward<T>(args)...);
     }
 
     template <typename A, typename... T>
-        requires(!detail::make<A, T && ...>::value)
+        requires(!detail::make<fn_make_strategy<std::shared_ptr<A>>, T && ...>::value)
     auto fn_make_shared(T&&... args) = delete;
 
     template <typename A, typename... T>
-        requires(detail::make<A, T && ...>::value)
+        requires(detail::make<fn_make_strategy<std::shared_ptr<A>>, T && ...>::value)
     auto fn_make_shared(T&&... args)
     {
-        return detail::make<std::shared_ptr<A>, T&&...>::call(std::forward<T>(args)...);
+        using type = detail::make<fn_make_strategy<std::shared_ptr<A>>, T&&...>;
+        return type::call(std::forward<T>(args)...);
     }
 }

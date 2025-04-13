@@ -89,64 +89,68 @@ struct Woof
 
 int main()
 {
-    using nil::xalt::literal;
-    using nil::xalt::str_name_type;
-    using nil::xalt::str_name_type_v;
-    using nil::xalt::str_name_value_v;
-    using nil::xalt::type_id;
+    using nil::xalt::literal_type;
+    using nil::xalt::literal_v;
+    std::cout << nil::xalt::replace<"Hello", "el", "wrr">::type::value << std::endl;
 
-    using type = MyType<nil::xalt::concat("Hello", " ", "World", " ", "wtf")>;
-    std::cout << nil::xalt::literal_v<nil::xalt::substr<4, 5>(literal("abcdefghijklmnop"))>
-              << std::endl;
-    std::cout << nil::xalt::find_match(literal("abcdefghi"), literal("def")) << std::endl;
-    std::cout << type().get_value() << std::endl;
-    std::cout << str_name_type_v<type> << std::endl;
-    std::cout << str_name_value_v<literal("asd")> << std::endl;
-    std::cout << str_name_value_v<Zip::ABC> << std::endl;
-    std::cout << stringify(Zip::DEF) << std::endl;
+    return 0;
+    // using nil::xalt::literal;
+    // using nil::xalt::str_name_type;
+    // using nil::xalt::str_name_type_v;
+    // using nil::xalt::str_name_value_v;
+    // using nil::xalt::type_id;
 
-    check<false>(&foo);
-    check<true>(&foo_n);
-    bar_check<false, false>(&bar::foo);
-    bar_check<false, true>(&bar::foo_c);
-    bar_check<true, false>(&bar::foo_n);
-    bar_check<true, true>(&bar::foo_n_c);
+    // using type = MyType<nil::xalt::concat("Hello", " ", "World", " ", "wtf")>;
+    // std::cout << nil::xalt::literal_v<nil::xalt::substr<4, 5>(literal("abcdefghijklmnop"))>
+    //           << std::endl;
+    // std::cout << nil::xalt::find_match(literal("abcdefghi"), literal("def")) << std::endl;
+    // std::cout << type().get_value() << std::endl;
+    // std::cout << str_name_type_v<type> << std::endl;
+    // std::cout << str_name_value_v<literal("asd")> << std::endl;
+    // std::cout << str_name_value_v<Zip::ABC> << std::endl;
+    // std::cout << stringify(Zip::DEF) << std::endl;
 
-    {
-        Woof<&bar::foo> w;
-        bar b;
-        w.wtf(b);
-    }
+    // check<false>(&foo);
+    // check<true>(&foo_n);
+    // bar_check<false, false>(&bar::foo);
+    // bar_check<false, true>(&bar::foo_c);
+    // bar_check<true, false>(&bar::foo_n);
+    // bar_check<true, true>(&bar::foo_n_c);
 
-    {
-        Woof<&foo> w;
-        w.wtf();
-    }
+    // {
+    //     Woof<&bar::foo> w;
+    //     bar b;
+    //     w.wtf(b);
+    // }
 
-    {
-        using namespace nil::xalt;
-        using namespace nil::xalt::detail;
-        static_assert(0b00000 == pow_2(0));
-        static_assert(0b00001 == pow_2(1));
-        static_assert(0b00010 == pow_2(2));
-        static_assert(0b00100 == pow_2(3));
-        static_assert(0b01000 == pow_2(4));
-        static_assert(0b10000 == pow_2(5));
-        static_assert(0b00000 == make_mask(0));
-        static_assert(0b00001 == make_mask(1));
-        static_assert(0b00011 == make_mask(2));
-        static_assert(0b00111 == make_mask(3));
-        static_assert(0b01111 == make_mask(4));
-        static_assert(0b11111 == make_mask(5));
-        using B = nil::xalt::noisy_type<"B">;
-        using A = nil::xalt::noisy_type<"A", B&, const B&>;
-        auto b = B();
-        const auto& [a, ua, sa] = std::make_tuple( //
-            nil::xalt::fn_make<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
-            nil::xalt::fn_make_unique<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
-            nil::xalt::fn_make_shared<A>(2, "std", 1, b, B(), "asd", "dsad", "hello")
-        );
+    // {
+    //     Woof<&foo> w;
+    //     w.wtf();
+    // }
 
-        return 0;
-    }
+    // {
+    //     using namespace nil::xalt;
+    //     using namespace nil::xalt::detail;
+    //     static_assert(0b00000 == pow_2(0));
+    //     static_assert(0b00001 == pow_2(1));
+    //     static_assert(0b00010 == pow_2(2));
+    //     static_assert(0b00100 == pow_2(3));
+    //     static_assert(0b01000 == pow_2(4));
+    //     static_assert(0b10000 == pow_2(5));
+    //     static_assert(0b00000 == make_mask(0));
+    //     static_assert(0b00001 == make_mask(1));
+    //     static_assert(0b00011 == make_mask(2));
+    //     static_assert(0b00111 == make_mask(3));
+    //     static_assert(0b01111 == make_mask(4));
+    //     static_assert(0b11111 == make_mask(5));
+    //     using B = nil::xalt::noisy_type<"B">;
+    //     using A = nil::xalt::noisy_type<"A", B&, const B&>;
+    //     auto b = B();
+    //     const auto& [a, ua, sa] = std::make_tuple( //
+    //         nil::xalt::fn_make<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
+    //         nil::xalt::fn_make_unique<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
+    //         nil::xalt::fn_make_shared<A>(2, "std", 1, b, B(), "asd", "dsad", "hello")
+    //     );
+
+    //     return 0;
 }

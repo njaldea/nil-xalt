@@ -29,10 +29,8 @@ namespace nil::xalt
             (..., (it = copy_n(&init_value_r.private_value[0], Rest - 1, it)));
         }
 
-        consteval std::size_t get_size() const
-        {
-            return N;
-        }
+        // NOLINTNEXTLINE
+        std::size_t private_size = N;
 
         // NOLINTNEXTLINE
         char private_value[N] = {};
@@ -57,48 +55,71 @@ namespace nil::xalt
     template <literal T>
     static constexpr auto literal_v = literal_type<T>::value;
 
-    template <std::size_t... N>
-    consteval auto concat(const literal<N>&... l)
-    {
-        return literal<((1 - sizeof...(N)) + ... + N)>(l...);
-    }
+    template <typename... T>
+    struct concat;
 
-    template <std::size_t... N>
-    // NOLINTNEXTLINE
-    consteval auto concat(const char (&... l)[N])
+    template <literal... T>
+    struct concat<literal_type<T>...>
     {
-        return concat(literal<N>(l)...);
-    }
+        using type = literal_type<literal<((1 - sizeof...(T)) + ... + T.private_size)>(T...)>;
+        static constexpr auto value = type::value;
+    };
 
-    template <std::size_t offset, std::size_t size, std::size_t N>
-    consteval auto substr(const literal<N>& l)
+    template <literal N, std::size_t offset, std::size_t size>
+    struct substr final
     {
-        return literal<size + 1>(&l.private_value[0], offset);
-    }
+        using type = literal_type<literal<size + 1>(&N.private_value[0], offset)>;
+        static constexpr auto value = type::value;
+    };
 
-    template <std::size_t N, std::size_t M>
-    consteval auto find_match(const literal<N>& from, const literal<M>& to_find) -> std::size_t
+    template <literal from, literal to_find>
+    struct find_match final
     {
-        if (M > N)
+    private:
+        static consteval auto eval() -> std::size_t
         {
-            return std::size_t(-1);
-        }
-        constexpr auto N_no_null = N - 1;
-        constexpr auto M_no_null = M - 1;
-        for (std::size_t i = 0; i < (N_no_null - M_no_null); ++i)
-        {
-            for (std::size_t j = 0; j < M_no_null; ++j)
+            if (from.private_size < to_find.private_size)
             {
-                if (from.private_value[i + j] != to_find.private_value[j])
+                return std::size_t(-1);
+            }
+            constexpr auto N_no_null = from.private_size - 1;
+            constexpr auto M_no_null = to_find.private_size - 1;
+            for (std::size_t i = 0; i < (N_no_null - M_no_null); ++i)
+            {
+                for (std::size_t j = 0; j < M_no_null; ++j)
                 {
-                    break;
-                }
-                if (j + 1 == M_no_null)
-                {
-                    return i;
+                    if (from.private_value[i + j] != to_find.private_value[j])
+                    {
+                        break;
+                    }
+                    if (j + 1 == M_no_null)
+                    {
+                        return i;
+                    }
                 }
             }
+            return std::size_t(-1);
         }
-        return std::size_t(-1);
-    }
+
+    public:
+        static constexpr auto value = eval();
+    };
+
+    template <literal N, literal M, literal O>
+    struct replace
+    {
+    private:
+        using match = find_match<N, M>;
+
+    public:
+        using type = concat<
+            typename substr<N, 0, match::value>::type,
+            literal_type<O>,
+            typename substr<
+                N,                                             // str
+                match::value + M.private_size - 1,             // offset
+                N.private_size - M.private_size - match::value // size
+                >::type                                        //
+            >::type;
+    };
 }
