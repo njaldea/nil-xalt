@@ -1,7 +1,7 @@
-#include <nil/xalt.hpp>
 #include <nil/xalt/fn_make.hpp>
 #include <nil/xalt/fn_sign.hpp>
 #include <nil/xalt/literal.hpp>
+#include <nil/xalt/noisy_type.hpp>
 #include <nil/xalt/str_name.hpp>
 #include <nil/xalt/stringify.hpp>
 #include <nil/xalt/type_id.hpp>
@@ -10,12 +10,12 @@
 #include <iostream>
 #include <string_view>
 
-template <nil::xalt::tp_literal T>
+template <nil::xalt::literal T>
 struct MyType
 {
     std::string_view get_value()
     {
-        return nil::xalt::literal<T>::value;
+        return nil::xalt::literal_v<T>;
     }
 };
 
@@ -87,63 +87,22 @@ struct Woof
     }
 };
 
-#define PR                                                                                         \
-    std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__PRETTY_FUNCTION__)          \
-              << std::endl
-
-struct B
-{
-    B()
-    {
-        PR;
-    }
-
-    B(const B&)
-    {
-        PR;
-    }
-
-    B(B&&) noexcept
-    {
-        PR;
-    }
-
-    B& operator=(const B& /* b */)
-    {
-        PR;
-        return *this;
-    }
-
-    B& operator=(B&& /* b */) noexcept
-    {
-        PR;
-        return *this;
-    }
-
-    ~B() = default;
-};
-
-template <typename... T>
-struct A
-{
-    explicit A(T... /* t */)
-    {
-        PR;
-    }
-};
-
 int main()
 {
+    using nil::xalt::literal;
     using nil::xalt::str_name_type;
-    using nil::xalt::str_name_value;
-    using nil::xalt::tp_literal;
+    using nil::xalt::str_name_type_v;
+    using nil::xalt::str_name_value_v;
     using nil::xalt::type_id;
 
     using type = MyType<nil::xalt::concat("Hello", " ", "World", " ", "wtf")>;
+    std::cout << nil::xalt::literal_v<nil::xalt::substr<4, 5>(literal("abcdefghijklmnop"))>
+              << std::endl;
+    std::cout << nil::xalt::find_match(literal("abcdefghi"), literal("def")) << std::endl;
     std::cout << type().get_value() << std::endl;
-    std::cout << str_name_type<type>::value << std::endl;
-    std::cout << str_name_value<tp_literal("asd")>::value << std::endl;
-    std::cout << str_name_value<Zip::ABC>::value << std::endl;
+    std::cout << str_name_type_v<type> << std::endl;
+    std::cout << str_name_value_v<literal("asd")> << std::endl;
+    std::cout << str_name_value_v<Zip::ABC> << std::endl;
     std::cout << stringify(Zip::DEF) << std::endl;
 
     check<false>(&foo);
@@ -179,12 +138,13 @@ int main()
         static_assert(0b00111 == make_mask(3));
         static_assert(0b01111 == make_mask(4));
         static_assert(0b11111 == make_mask(5));
-        using AA = A<B&, const B&>;
+        using B = nil::xalt::noisy_type<"B">;
+        using A = nil::xalt::noisy_type<"A", B&, const B&>;
         auto b = B();
-        auto [a, ua, sa] = std::make_tuple( //
-            nil::xalt::fn_make<AA>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
-            nil::xalt::fn_make_unique<AA>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
-            nil::xalt::fn_make_shared<AA>(2, "std", 1, b, B(), "asd", "dsad", "hello")
+        const auto& [a, ua, sa] = std::make_tuple( //
+            nil::xalt::fn_make<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
+            nil::xalt::fn_make_unique<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
+            nil::xalt::fn_make_shared<A>(2, "std", 1, b, B(), "asd", "dsad", "hello")
         );
 
         return 0;

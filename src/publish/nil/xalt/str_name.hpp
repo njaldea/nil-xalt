@@ -11,7 +11,7 @@ namespace nil::xalt
     private:
         static consteval auto name()
         {
-            return detail::tparam_name<tp_literal(__PRETTY_FUNCTION__)>();
+            return detail::tparam_name<__PRETTY_FUNCTION__>();
         }
 
     public:
@@ -24,7 +24,7 @@ namespace nil::xalt
     private:
         static consteval auto name()
         {
-            return detail::tparam_name<tp_literal(__PRETTY_FUNCTION__)>();
+            return detail::tparam_name<__PRETTY_FUNCTION__>();
         }
 
     public:
