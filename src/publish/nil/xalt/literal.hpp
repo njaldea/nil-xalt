@@ -1,5 +1,7 @@
 #pragma once
 
+#include "errors.hpp"
+
 #include <cstddef>
 
 namespace nil::xalt
@@ -55,71 +57,61 @@ namespace nil::xalt
     template <literal T>
     static constexpr auto literal_v = literal_type<T>::value;
 
-    template <typename... T>
-    struct concat;
-
     template <literal... T>
-    struct concat<literal_type<T>...>
+    consteval auto concat() -> literal<((1 - sizeof...(T)) + ... + T.private_size)>
     {
-        using type = literal_type<literal<((1 - sizeof...(T)) + ... + T.private_size)>(T...)>;
-        static constexpr auto value = type::value;
-    };
+        return literal<((1 - sizeof...(T)) + ... + T.private_size)>(T...);
+    }
 
     template <literal N, std::size_t offset, std::size_t size>
-    struct substr final
+    consteval auto substr() -> literal<size + 1>
     {
-        using type = literal_type<literal<size + 1>(&N.private_value[0], offset)>;
-        static constexpr auto value = type::value;
-    };
+        return literal<size + 1>(&N.private_value[0], offset);
+    }
 
     template <literal from, literal to_find>
-    struct find_match final
+    consteval auto find_match() -> std::size_t
     {
-    private:
-        static consteval auto eval() -> std::size_t
+        if (from.private_size < to_find.private_size)
         {
-            if (from.private_size < to_find.private_size)
-            {
-                return std::size_t(-1);
-            }
-            constexpr auto N_no_null = from.private_size - 1;
-            constexpr auto M_no_null = to_find.private_size - 1;
-            for (std::size_t i = 0; i < (N_no_null - M_no_null); ++i)
-            {
-                for (std::size_t j = 0; j < M_no_null; ++j)
-                {
-                    if (from.private_value[i + j] != to_find.private_value[j])
-                    {
-                        break;
-                    }
-                    if (j + 1 == M_no_null)
-                    {
-                        return i;
-                    }
-                }
-            }
             return std::size_t(-1);
         }
+        constexpr auto N_no_null = from.private_size - 1;
+        constexpr auto M_no_null = to_find.private_size - 1;
+        for (std::size_t i = 0; i < (N_no_null - M_no_null); ++i)
+        {
+            for (std::size_t j = 0; j < M_no_null; ++j)
+            {
+                if (from.private_value[i + j] != to_find.private_value[j])
+                {
+                    break;
+                }
+                if (j + 1 == M_no_null)
+                {
+                    return i;
+                }
+            }
+        }
+        return std::size_t(-1);
+    }
 
-    public:
-        static constexpr auto value = eval();
-    };
-
-    template <literal N, literal M, literal O>
-    struct replace
+    template <literal base, literal from, literal to>
+    consteval auto replace()
     {
-    private:
-        using match = find_match<N, M>;
-
-    public:
-        using type = concat<
-            typename substr<N, 0, match::value>::type,
-            literal_type<O>,
-            typename substr<
-                N,                                             // str
-                match::value + M.private_size - 1,             // offset
-                N.private_size - M.private_size - match::value // size
-                >::type                                        //
-            >::type;
-    };
+        constexpr auto index1 = find_match<base, from>();
+        if constexpr (index1 != size_t(-1))
+        {
+            constexpr auto index2 = index1 + from.private_size - 1;
+            constexpr auto remaining_size = base.private_size - index2;
+            constexpr auto section1 = substr<base, 0, index1>();
+            constexpr auto section2 = substr<base, index2, remaining_size>();
+            return concat<section1, to, section2>();
+        }
+        else
+        {
+            constexpr auto error_msg = concat<from, " not found in ", base>();
+            unreachable<error_msg>();
+            return error_msg;
+        }
+    }
 }
