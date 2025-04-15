@@ -3,11 +3,12 @@ project(xalt)
 set(
     HEADERS
         publish/nil/xalt/cast.hpp
-        publish/nil/xalt/concepts.hpp
+        publish/nil/xalt/checks.hpp
         publish/nil/xalt/errors.hpp
         publish/nil/xalt/fn_make.hpp
         publish/nil/xalt/fn_sign.hpp
         publish/nil/xalt/literal.hpp
+        publish/nil/xalt/noisy_type.hpp
         publish/nil/xalt/str_name.hpp
         publish/nil/xalt/stringify.hpp
         publish/nil/xalt/tlist.hpp
