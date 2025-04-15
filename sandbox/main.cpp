@@ -89,17 +89,23 @@ struct Woof
 
 int main()
 {
+    using nil::xalt::concat;
+    using nil::xalt::find_match;
     using nil::xalt::literal;
+    using nil::xalt::literal_v;
+    using nil::xalt::replace_all;
+    using nil::xalt::replace_one;
     using nil::xalt::str_name_type;
     using nil::xalt::str_name_type_v;
     using nil::xalt::str_name_value_v;
+    using nil::xalt::substr;
     using nil::xalt::type_id;
 
-    using type = MyType<nil::xalt::concat<"Hello", " ", "World", " ", "wtf">()>;
-    std::cout << nil::xalt::literal_v<nil::xalt::substr<"abcdefghijklmnop", 4, 5>()> << std::endl;
-    std::cout << nil::xalt::find_match<"abcdefghi", "def">() << std::endl;
-    std::cout << nil::xalt::literal_v<nil::xalt::replace<"abcdefghi", "def", "_njla_">()>
-              << std::endl;
+    using type = MyType<concat<"Hello", " ", "World", " ", "wtf">()>;
+    std::cout << literal_v<substr<"abcdefghijklmnop", 4, 5>()> << std::endl;
+    std::cout << find_match<"abcdefghi", "def">() << std::endl;
+    std::cout << literal_v<replace_one<"abcdefghi", "def", "_njla_">()> << std::endl;
+    std::cout << literal_v<replace_all<"abcdefghiabcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << type().get_value() << std::endl;
     std::cout << str_name_type_v<type> << std::endl;
     std::cout << str_name_value_v<literal("asd")> << std::endl;

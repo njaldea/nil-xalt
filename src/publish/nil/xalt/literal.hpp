@@ -69,16 +69,16 @@ namespace nil::xalt
         return literal<size + 1>(&N.private_value[0], offset);
     }
 
-    template <literal from, literal to_find>
+    template <literal from, literal to_find, std::size_t offset = 0>
     consteval auto find_match() -> std::size_t
     {
         if (from.private_size < to_find.private_size)
         {
-            return std::size_t(-1);
+            return from.private_size;
         }
         constexpr auto N_no_null = from.private_size - 1;
         constexpr auto M_no_null = to_find.private_size - 1;
-        for (std::size_t i = 0; i < (N_no_null - M_no_null); ++i)
+        for (std::size_t i = offset; i < (N_no_null - M_no_null); ++i)
         {
             for (std::size_t j = 0; j < M_no_null; ++j)
             {
@@ -92,14 +92,18 @@ namespace nil::xalt
                 }
             }
         }
-        return std::size_t(-1);
+        return from.private_size;
     }
 
     template <literal base, literal from, literal to>
-    consteval auto replace()
+    consteval auto replace_one()
     {
         constexpr auto index1 = find_match<base, from>();
-        if constexpr (index1 != size_t(-1))
+        if constexpr (index1 == base.private_size)
+        {
+            return base;
+        }
+        else
         {
             constexpr auto index2 = index1 + from.private_size - 1;
             constexpr auto remaining_size = base.private_size - index2;
@@ -107,11 +111,23 @@ namespace nil::xalt
             constexpr auto section2 = substr<base, index2, remaining_size>();
             return concat<section1, to, section2>();
         }
+    }
+
+    template <literal base, literal from, literal to>
+    consteval auto replace_all()
+    {
+        constexpr auto index1 = find_match<base, from>();
+        if constexpr (index1 == base.private_size)
+        {
+            return base;
+        }
         else
         {
-            constexpr auto error_msg = concat<from, " not found in ", base>();
-            unreachable<error_msg>();
-            return error_msg;
+            constexpr auto index2 = index1 + from.private_size - 1;
+            constexpr auto remaining_size = base.private_size - index2;
+            constexpr auto section1 = substr<base, 0, index1>();
+            constexpr auto section2 = substr<base, index2, remaining_size>();
+            return replace_all<concat<section1, to, section2>(), from, to>();
         }
     }
 }
