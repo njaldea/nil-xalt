@@ -56,7 +56,7 @@ void check(T /* t */)
 {
     using nil::xalt::fn_sign;
     static_assert(std::is_same_v<typename fn_sign<T>::return_type, void>);
-    static_assert(std::is_same_v<typename fn_sign<T>::class_name, void>);
+    static_assert(std::is_same_v<typename fn_sign<T>::class_type, void>);
     static_assert(fn_sign<T>::is_const);
     static_assert(fn_sign<T>::is_noexcept == nc);
 }
@@ -66,7 +66,7 @@ void bar_check(T /* t */)
 {
     using nil::xalt::fn_sign;
     static_assert(std::is_same_v<typename fn_sign<T>::return_type, void>);
-    static_assert(std::is_same_v<typename fn_sign<T>::class_name, bar>);
+    static_assert(std::is_same_v<typename fn_sign<T>::class_type, bar>);
     static_assert(fn_sign<T>::is_const == cc);
     static_assert(fn_sign<T>::is_noexcept == nc);
 }
@@ -76,13 +76,13 @@ struct Woof
 {
     void wtf(bar& b)
     {
-        static_assert(std::is_same_v<typename nil::xalt::fn_sign<decltype(T)>::class_name, bar>);
+        static_assert(std::is_same_v<typename nil::xalt::fn_sign<decltype(T)>::class_type, bar>);
         std::invoke(T, b);
     }
 
     void wtf()
     {
-        static_assert(std::is_same_v<typename nil::xalt::fn_sign<decltype(T)>::class_name, void>);
+        static_assert(std::is_same_v<typename nil::xalt::fn_sign<decltype(T)>::class_type, void>);
         std::invoke(T);
     }
 };
