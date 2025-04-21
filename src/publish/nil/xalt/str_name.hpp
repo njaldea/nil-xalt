@@ -8,26 +8,22 @@ namespace nil::xalt
     template <typename T>
     struct str_name_type final
     {
-    private:
         static consteval auto name()
         {
             return detail::tparam_name<__PRETTY_FUNCTION__>();
         }
 
-    public:
         static constexpr auto value = literal_v<name()>;
     };
 
     template <auto T>
     struct str_name_value final
     {
-    private:
         static consteval auto name()
         {
             return detail::tparam_name<__PRETTY_FUNCTION__>();
         }
 
-    public:
         static constexpr auto value = literal_v<name()>;
     };
 
