@@ -3,6 +3,7 @@
 #include "errors.hpp"
 
 #include <cstddef>
+#include <string_view>
 
 namespace nil::xalt
 {
@@ -51,11 +52,11 @@ namespace nil::xalt
     template <literal T>
     struct literal_type final
     {
-        static constexpr auto value = T.private_value;
+        static constexpr const auto& value = T.private_value;
     };
 
     template <literal T>
-    static constexpr auto literal_v = literal_type<T>::value;
+    static constexpr auto literal_v = std::string_view(literal_type<T>::value);
 
     template <literal... T>
     consteval auto concat() -> literal<((1 - sizeof...(T)) + ... + T.private_size)>

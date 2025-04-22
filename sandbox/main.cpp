@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <nil/xalt/fn_make.hpp>
 #include <nil/xalt/fn_sign.hpp>
 #include <nil/xalt/literal.hpp>
@@ -19,7 +20,7 @@ struct MyType
     }
 };
 
-enum class Zip
+enum class Zip : std::uint8_t
 {
     ABC,
     DEF,
@@ -42,6 +43,7 @@ struct bar
 {
     void foo()
     {
+        (void)this;
         std::cout << __FILE__ << ':' << __LINE__ << ':' << (const char*)(__PRETTY_FUNCTION__)
                   << std::endl;
     }
@@ -102,7 +104,8 @@ int main()
     using nil::xalt::type_id;
 
     using type = MyType<concat<"Hello", " ", "World", " ", "wtf">()>;
-    std::cout << literal_v<substr<"abcdefghijklmnop", 4, 5>()> << std::endl;
+    constexpr auto z = substr<"abcdefghijklmnop", 4, 5>();
+    std::cout << nil::xalt::literal_v<z> << std::endl;
     std::cout << find_match<"abcdefghi", "def">() << std::endl;
     std::cout << literal_v<replace_one<"abcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << literal_v<replace_all<"abcdefghiabcdefghi", "def", "_njla_">()> << std::endl;
