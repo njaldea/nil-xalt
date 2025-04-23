@@ -16,7 +16,7 @@ struct MyType
 {
     std::string_view get_value()
     {
-        return nil::xalt::literal_v<T>;
+        return nil::xalt::literal_sv<T>;
     }
 };
 
@@ -94,6 +94,7 @@ int main()
     using nil::xalt::concat;
     using nil::xalt::find_match;
     using nil::xalt::literal;
+    using nil::xalt::literal_sv;
     using nil::xalt::literal_v;
     using nil::xalt::replace_all;
     using nil::xalt::replace_one;
@@ -105,10 +106,10 @@ int main()
 
     using type = MyType<concat<"Hello", " ", "World", " ", "wtf">()>;
     constexpr auto z = substr<"abcdefghijklmnop", 4, 5>();
-    std::cout << nil::xalt::literal_v<z> << std::endl;
+    std::cout << literal_sv<z> << std::endl;
     std::cout << find_match<"abcdefghi", "def">() << std::endl;
-    std::cout << literal_v<replace_one<"abcdefghi", "def", "_njla_">()> << std::endl;
-    std::cout << literal_v<replace_all<"abcdefghiabcdefghi", "def", "_njla_">()> << std::endl;
+    std::cout << literal_sv<replace_one<"abcdefghi", "def", "_njla_">()> << std::endl;
+    std::cout << literal_sv<replace_all<"abcdefghiabcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << type().get_value() << std::endl;
     std::cout << str_name_type_v<type> << std::endl;
     std::cout << str_name_value_v<literal("asd")> << std::endl;

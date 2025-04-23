@@ -3,13 +3,13 @@
 namespace nil::xalt
 {
     template <typename T>
-    struct type_id_tag
+    struct type_id_tag final
     {
         static constexpr char value = '\0';
     };
 
     template <typename T>
-    struct type_id
+    struct type_id final
     {
         static constexpr const void* value = &type_id_tag<T>::value;
     };

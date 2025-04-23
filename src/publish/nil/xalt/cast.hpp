@@ -5,7 +5,7 @@
 namespace nil::xalt
 {
     template <typename T>
-    struct explicit_cast
+    struct explicit_cast final
     {
         T cast() const
         {
@@ -16,10 +16,10 @@ namespace nil::xalt
     };
 
     template <typename T>
-    struct implicit_cast
+    struct implicit_cast final
     {
         template <typename U>
-        // NOLINTNEXTLINE
+        // NOLINTNEXTLINE(hicpp-explicit-conversions)
         operator U&&() const
         {
             return static_cast<U&&>(*ptr);
