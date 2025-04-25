@@ -47,28 +47,31 @@ namespace nil::xalt
     struct literal_type final
     {
         static constexpr const auto& value = T.private_value;
+        static constexpr const auto value_sv = std::string_view(T.private_value);
     };
 
     template <literal T>
     static constexpr const auto& literal_v = literal_type<T>::value;
     template <literal T>
-    static constexpr auto literal_sv = std::string_view(literal_v<T>);
+    static constexpr const auto& literal_sv = literal_type<T>::value_sv;
 
     template <literal... T>
-    consteval auto concat() -> literal<((1 - sizeof...(T)) + ... + sizeof(T))>
+    consteval auto concat() -> literal<(1 + ... + (sizeof(T) - 1))>
     {
-        return literal<((1 - sizeof...(T)) + ... + sizeof(T))>(T...);
+        return literal<(1 + ... + (sizeof(T) - 1))>(T...);
     }
 
     template <literal N, std::size_t offset, std::size_t size>
     consteval auto substr() -> literal<size + 1>
     {
+        static_assert(N > offset + size + 1);
         return literal<size + 1>(&N.private_value[0], offset);
     }
 
     template <literal from, literal to_find, std::size_t offset = 0>
     consteval auto find_match() -> std::size_t
     {
+        static_assert(offset < sizeof(from));
         if (sizeof(to_find) < sizeof(from))
         {
             constexpr auto N_no_null = sizeof(from) - 1;
