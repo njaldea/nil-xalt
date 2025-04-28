@@ -64,19 +64,19 @@ namespace nil::xalt
     template <literal N, std::size_t offset, std::size_t size>
     consteval auto substr() -> literal<size + 1>
     {
-        static_assert(N > offset + size + 1);
+        static_assert(offset + size <= sizeof(N));
         return literal<size + 1>(&N.private_value[0], offset);
     }
 
-    template <literal from, literal to_find, std::size_t offset = 0>
+    template <literal from, literal to_find, std::size_t offset = 0, std::size_t end = sizeof(from)>
     consteval auto find_match() -> std::size_t
     {
         static_assert(offset < sizeof(from));
         if (sizeof(to_find) < sizeof(from))
         {
-            constexpr auto N_no_null = sizeof(from) - 1;
+            constexpr auto N_no_null = end - 1;
             constexpr auto M_no_null = sizeof(to_find) - 1;
-            for (std::size_t i = offset; i < (N_no_null - M_no_null); ++i)
+            for (std::size_t i = offset; i < end && i < (N_no_null - M_no_null); ++i)
             {
                 for (std::size_t j = 0; j < M_no_null; ++j)
                 {
@@ -91,7 +91,13 @@ namespace nil::xalt
                 }
             }
         }
-        return sizeof(from);
+        return end;
+    }
+
+    template <literal from, literal to_find>
+    consteval auto starts_with() -> bool
+    {
+        return find_match<from, to_find, 0, 1>() == 0;
     }
 
     template <literal base, literal from, literal to>

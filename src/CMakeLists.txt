@@ -10,7 +10,7 @@ set(
         publish/nil/xalt/literal.hpp
         publish/nil/xalt/noisy_type.hpp
         publish/nil/xalt/str_name.hpp
-        publish/nil/xalt/stringify.hpp
+        publish/nil/xalt/str_enum.hpp
         publish/nil/xalt/tlist.hpp
         publish/nil/xalt/type_id.hpp
         publish/nil/xalt/detail/tparam_name.hpp
