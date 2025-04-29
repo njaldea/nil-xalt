@@ -15,5 +15,5 @@ namespace nil::xalt
     };
 
     template <typename T>
-    static constexpr auto type_id_v = type_id<T>::value;
+    static constexpr const void* type_id_v = type_id<T>::value;
 }

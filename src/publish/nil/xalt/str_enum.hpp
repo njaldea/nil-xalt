@@ -10,9 +10,7 @@
 namespace nil::xalt
 {
     template <typename T>
-    struct enum_traits
-    {
-    };
+    struct str_enum_scan;
 
     namespace detail
     {
@@ -34,21 +32,12 @@ namespace nil::xalt
             using type = tlist_values<O...>;
         };
 
-        template <std::size_t start, std::size_t step, typename T>
-        struct values;
-
-        template <std::size_t start, std::size_t step, std::size_t... I>
-        struct values<start, step, std::index_sequence<I...>>
-        {
-            using type = std::index_sequence<((I * step) + start)...>;
-        };
-
         template <typename T>
-        consteval std::size_t get_start()
+        consteval std::size_t scan_start()
         {
-            if constexpr (requires() { enum_traits<T>::start; })
+            if constexpr (requires() { str_enum_scan<T>::start; })
             {
-                return enum_traits<T>::start;
+                return str_enum_scan<T>::start;
             }
             else
             {
@@ -57,11 +46,11 @@ namespace nil::xalt
         }
 
         template <typename T>
-        consteval std::size_t get_step()
+        consteval std::size_t scan_step()
         {
-            if constexpr (requires() { enum_traits<T>::step; })
+            if constexpr (requires() { str_enum_scan<T>::step; })
             {
-                return enum_traits<T>::step;
+                return str_enum_scan<T>::step;
             }
             else
             {
@@ -70,32 +59,33 @@ namespace nil::xalt
         }
 
         template <typename T>
-        consteval std::size_t get_range()
+        consteval std::size_t scan_end()
         {
-            if constexpr (requires() { enum_traits<T>::end; })
+            if constexpr (requires() { str_enum_scan<T>::end; })
             {
-                return (enum_traits<T>::end - get_start<T>()) / get_step<T>();
+                return str_enum_scan<T>::end;
             }
             else
             {
-                return (25 - get_start<T>()) / get_step<T>();
+                return 25;
             }
         }
 
         template <typename T>
-        struct scan
+        struct scan final
         {
-            using type = scan_values<
-                T,
-                typename values<
-                    get_start<T>(),
-                    get_step<T>(),
-                    std::make_index_sequence<get_range<T>()>>::type>::type;
+            template <std::size_t... I>
+            static auto make_values(std::index_sequence<I...> /* indices */)
+                -> std::index_sequence<((I * scan_step<T>()) + scan_start<T>())...>;
+
+            static constexpr auto range = (scan_end<T>() - scan_start<T>()) / scan_step<T>();
+            using values = decltype(make_values(std::make_index_sequence<range>()));
+            using type = scan_values<T, values>::type;
         };
     }
 
     template <typename T>
-    struct enum_values
+    struct enum_values final
     {
         using type = typename detail::scan<T>::type;
     };
