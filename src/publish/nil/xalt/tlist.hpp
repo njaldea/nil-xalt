@@ -36,11 +36,17 @@ namespace nil::xalt
     };
 
     template <typename T>
+    using to_tlist_types_t = typename to_tlist_types<T>::type;
+
+    template <typename T>
     struct to_tlist_values;
 
     template <template <auto...> typename T, auto... U>
-    struct to_tlist_types<T<U...>>
+    struct to_tlist_values<T<U...>>
     {
         using type = tlist_values<U...>;
     };
+
+    template <typename T>
+    using to_tlist_values_t = typename to_tlist_values<T>::type;
 }

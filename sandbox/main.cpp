@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <nil/xalt/errors.hpp>
 #include <nil/xalt/fn_make.hpp>
 #include <nil/xalt/fn_sign.hpp>
 #include <nil/xalt/literal.hpp>

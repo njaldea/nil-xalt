@@ -3,8 +3,8 @@
 namespace nil::xalt
 {
     template <typename... T>
-    void unreachable() = delete;
+    void undefined() = delete;
 
     template <auto... T>
-    void unreachable() = delete;
+    void undefined() = delete;
 }
