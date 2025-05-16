@@ -71,7 +71,7 @@ int main()
 |-------------|-------------------------------------------------|
 | concat      | `<literal...>`                                  |
 | substr      | `<literal, offset, size>`                       |
-| find_match  | `<literal from, literal to_find, offset, end>`  |
+| find_first  | `<literal from, literal to_find, offset, end>`  |
 | starts_with | `<literal from, literal to_find>`               |
 | replace_one | `<literal base, literal from, literal to>`      |
 | replace_all | `<literal base, literal from, literal to>`      |
@@ -86,7 +86,7 @@ int main()
     std::puts(literal_v<substr<"hello", 2, 3>()>);
     // "llo"
 
-    static_assert(find_match<"hello", "ll", 0, 6>() == 2);
+    static_assert(find_first<"hello", "ll", 0, 6>() == 2);
     static_assert(starts_with<"hello", "he">());
 
     std::puts(literal_v<replace_one<"abcdabcd", "bc", "BC">()>);
@@ -206,6 +206,9 @@ int main()
     using new_t = to_tlist_types<std::tuple<int, bool>>::type;
     // or
     using new_t = to_tlist_types_t<std::tuple<int, bool>>;
+
+    using type_at_0 = types::at<0>; // int
+    using type_at_1 = types::at<1>; // bool
 }
 ```
 
@@ -235,6 +238,9 @@ int main()
     using new_v = to_tlist_values<std::make_index_sequence<10>>::type;
     // or
     using new_v = to_tlist_values_t<std::make_index_sequence<10>>;
+
+    static constexpr auto value_at_0 = values::at<0>; // 0
+    static constexpr auto value_at_1 = values::at<1>; // 1
 }
 ```
 

@@ -6,6 +6,7 @@
 #include <nil/xalt/noisy_type.hpp>
 #include <nil/xalt/str_enum.hpp>
 #include <nil/xalt/str_name.hpp>
+#include <nil/xalt/transparent_stl.hpp>
 #include <nil/xalt/type_id.hpp>
 
 #include <functional>
@@ -93,7 +94,7 @@ int main()
     using type = MyType<concat<"Hello", " ", "World", " ", "wtf">()>;
     constexpr auto z = substr<"abcdefghijklmnop", 4, 5>();
     std::cout << literal_sv<z> << std::endl;
-    std::cout << find_match<"abcdefghi", "def">() << std::endl;
+    std::cout << find_first<"abcdefghi", "def">() << std::endl;
     std::cout << literal_sv<replace_one<"abcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << literal_sv<replace_all<"abcdefghiabcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << type().get_value() << std::endl;

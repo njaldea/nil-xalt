@@ -69,7 +69,7 @@ namespace nil::xalt
     }
 
     template <literal from, literal to_find, std::size_t offset = 0, std::size_t end = sizeof(from)>
-    consteval auto find_match() -> std::size_t
+    consteval auto find_first() -> std::size_t
     {
         static_assert(offset < sizeof(from));
         if (sizeof(to_find) < sizeof(from))
@@ -97,13 +97,13 @@ namespace nil::xalt
     template <literal from, literal to_find>
     consteval auto starts_with() -> bool
     {
-        return find_match<from, to_find, 0, 1>() == 0;
+        return find_first<from, to_find, 0, 1>() == 0;
     }
 
     template <literal base, literal from, literal to>
     consteval auto replace_one()
     {
-        constexpr auto index1 = find_match<base, from>();
+        constexpr auto index1 = find_first<base, from>();
         if constexpr (index1 == sizeof(base))
         {
             return base;
@@ -121,7 +121,7 @@ namespace nil::xalt
     template <literal base, literal from, literal to>
     consteval auto replace_all()
     {
-        constexpr auto index1 = find_match<base, from>();
+        constexpr auto index1 = find_first<base, from>();
         if constexpr (index1 == sizeof(base))
         {
             return base;

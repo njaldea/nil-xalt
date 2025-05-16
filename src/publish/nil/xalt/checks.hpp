@@ -15,5 +15,5 @@ namespace nil::xalt
     };
 
     template <typename T, template <typename...> typename U>
-    constexpr auto is_of_template_v = is_of_template<T, U>::value;
+    concept is_of_template_v = is_of_template<T, U>::value;
 }

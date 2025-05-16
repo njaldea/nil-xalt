@@ -13,6 +13,7 @@ namespace nil::xalt::detail
     {
         using type = literal_type<U>;
         constexpr auto pretty_print = std::string_view(type::value);
+
         // +2 is to move the starting position to the start of YourType
         constexpr auto pos1 = pretty_print.find_first_of('=') + 2;
         constexpr auto pos2 = pretty_print.find_first_of(']', pos1);

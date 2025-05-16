@@ -47,8 +47,7 @@ namespace nil::xalt::detail
     public:
         static auto call(Args... args)
         {
-            static constexpr auto mask = detail::make_mask(sizeof...(Args));
-            return apply<mask>(std::forward<Args>(args)...);
+            return apply<detail::make_mask(sizeof...(Args))>(std::forward<Args>(args)...);
         }
 
         static constexpr bool value = (sizeof...(Args) < 64)
@@ -132,31 +131,18 @@ namespace nil::xalt
         requires(detail::make<fn_make_strategy<A>, T && ...>::value)
     auto fn_make(T&&... args)
     {
-        using type = detail::make<fn_make_strategy<A>, T&&...>;
-        return type::call(std::forward<T>(args)...);
+        return detail::make<fn_make_strategy<A>, T&&...>::call(std::forward<T>(args)...);
     }
 
     template <typename A, typename... T>
-        requires(!detail::make<fn_make_strategy<std::unique_ptr<A>>, T && ...>::value)
-    auto fn_make_unique(T&&... args) = delete;
-
-    template <typename A, typename... T>
-        requires(detail::make<fn_make_strategy<std::unique_ptr<A>>, T && ...>::value)
     auto fn_make_unique(T&&... args)
     {
-        using type = detail::make<fn_make_strategy<std::unique_ptr<A>>, T&&...>;
-        return type::call(std::forward<T>(args)...);
+        return fn_make<std::unique_ptr<A>>(std::forward<T>(args)...);
     }
 
     template <typename A, typename... T>
-        requires(!detail::make<fn_make_strategy<std::shared_ptr<A>>, T && ...>::value)
-    auto fn_make_shared(T&&... args) = delete;
-
-    template <typename A, typename... T>
-        requires(detail::make<fn_make_strategy<std::shared_ptr<A>>, T && ...>::value)
     auto fn_make_shared(T&&... args)
     {
-        using type = detail::make<fn_make_strategy<std::shared_ptr<A>>, T&&...>;
-        return type::call(std::forward<T>(args)...);
+        return fn_make<std::shared_ptr<A>>(std::forward<T>(args)...);
     }
 }

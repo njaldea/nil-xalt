@@ -12,41 +12,31 @@ namespace nil::xalt
     template <typename T>
     struct str_enum_scan;
 
-    namespace detail
+    namespace detail::scan
     {
-        template <typename T, typename I = std::index_sequence<>, typename O = tlist_values<>>
-        struct scan_values;
+        template <typename T, typename I = tlist_values<>, typename O = tlist_values<>>
+        struct values;
 
         template <typename T, std::size_t IA, std::size_t... I, T... O>
-        struct scan_values<T, std::index_sequence<IA, I...>, tlist_values<O...>>
+        struct values<T, tlist_values<IA, I...>, tlist_values<O...>>
             : std::conditional_t<
                   starts_with<str_name_value_v<T(IA)>, concat<str_name_type_v<T>, "::">()>(),
-                  scan_values<T, std::index_sequence<I...>, tlist_values<O..., T(IA)>>,
-                  scan_values<T, std::index_sequence<>, tlist_values<O...>>>
+                  values<T, tlist_values<I...>, tlist_values<O..., T(IA)>>,
+                  values<T, tlist_values<>, tlist_values<O...>>>
         {
         };
 
         template <typename T, T... O>
-        struct scan_values<T, std::index_sequence<>, tlist_values<O...>>
+        struct values<T, tlist_values<>, tlist_values<O...>>
         {
             using type = tlist_values<O...>;
         };
 
         template <typename T>
-        consteval std::size_t scan_start()
-        {
-            if constexpr (requires() { str_enum_scan<T>::start; })
-            {
-                return str_enum_scan<T>::start;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        consteval std::size_t start();
 
         template <typename T>
-        consteval std::size_t scan_step()
+        consteval std::size_t step()
         {
             if constexpr (requires() { str_enum_scan<T>::step; })
             {
@@ -59,7 +49,7 @@ namespace nil::xalt
         }
 
         template <typename T>
-        consteval std::size_t scan_end()
+        consteval std::size_t end()
         {
             if constexpr (requires() { str_enum_scan<T>::end; })
             {
@@ -72,32 +62,83 @@ namespace nil::xalt
         }
 
         template <typename T>
-        struct scan final
+        consteval std::size_t range()
         {
-            template <std::size_t... I>
-            static auto make_values(std::index_sequence<I...> /* indices */)
-                -> std::index_sequence<((I * scan_step<T>()) + scan_start<T>())...>;
+            return (end<T>() - start<T>()) / step<T>();
+        }
 
-            static constexpr auto range = (scan_end<T>() - scan_start<T>()) / scan_step<T>();
-            using values = decltype(make_values(std::make_index_sequence<range>()));
-            using type = scan_values<T, values>::type;
-        };
+        template <typename T>
+        constexpr std::size_t increment(std::size_t i)
+        {
+            return start<T>() + (i * step<T>());
+        }
+
+        template <typename T>
+        constexpr std::size_t mask(std::size_t i)
+        {
+            return 0x1 << (i * step<T>());
+        }
+
+        template <typename T>
+        consteval auto predicate()
+        {
+            if constexpr (requires() { str_enum_scan<T>::predicate; })
+            {
+                return str_enum_scan<T>::predicate;
+            }
+            else
+            {
+                return &increment<T>;
+            }
+        }
+
+        template <typename T>
+        consteval std::size_t start()
+        {
+            if constexpr (requires() { str_enum_scan<T>::start; })
+            {
+                return str_enum_scan<T>::start;
+            }
+            else if constexpr (requires() { str_enum_scan<T>::predicate; })
+            {
+                if constexpr (str_enum_scan<T>::predicate == &mask<T>)
+                {
+                    return 0b1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        template <typename T>
+        using list = to_tlist_values_t<std::make_index_sequence<range<T>()>>;
+
+        template <typename T>
+        using applied_list = list<T>::template apply<predicate<T>()>;
+
+        template <typename T>
+        using enumeration = typename values<T, applied_list<T>>::type;
     }
 
     template <typename T>
-    struct enum_values final
-    {
-        using type = typename detail::scan<T>::type;
-    };
+    using enum_values = detail::scan::enumeration<T>;
 
     template <typename T>
     std::string_view str_enum(T enum_value)
     {
-        return []<T... values>(T value, tlist_values<values...>)
+        constexpr auto each = []<T... values>(T value, tlist_values<values...>)
         {
             const char* name = nullptr;
-            (((name = values == value ? str_name_value_v<values> : nullptr) != nullptr) || ...);
+            (void)(((name = values == value ? str_name_value_v<values> : nullptr) != nullptr) || ...
+            );
             return name != nullptr ? name : "-";
-        }(enum_value, typename enum_values<T>::type());
+        };
+        return each(enum_value, enum_values<T>());
     }
 }

@@ -13,6 +13,7 @@ set(
         publish/nil/xalt/str_enum.hpp
         publish/nil/xalt/tlist.hpp
         publish/nil/xalt/type_id.hpp
+        publish/nil/xalt/transparent_stl.hpp
         publish/nil/xalt/detail/tparam_name.hpp
 )
 
@@ -32,3 +33,5 @@ target_include_directories(
 
 nil_install_headers()
 nil_install_targets(${PROJECT_NAME})
+
+add_test_subdirectory()
