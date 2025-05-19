@@ -14,7 +14,6 @@ set(
         publish/nil/xalt/tlist.hpp
         publish/nil/xalt/type_id.hpp
         publish/nil/xalt/transparent_stl.hpp
-        publish/nil/xalt/detail/tparam_name.hpp
 )
 
 

@@ -20,7 +20,7 @@ namespace nil::xalt
         template <typename T, std::size_t IA, std::size_t... I, T... O>
         struct values<T, tlist_values<IA, I...>, tlist_values<O...>>
             : std::conditional_t<
-                  starts_with<str_name_value_v<T(IA)>, concat<str_name_type_v<T>, "::">()>(),
+                  starts_with<str_name_value<T(IA)>(), concat<str_name_type<T>(), "::">()>(),
                   values<T, tlist_values<I...>, tlist_values<O..., T(IA)>>,
                   values<T, tlist_values<>, tlist_values<O...>>>
         {

@@ -51,9 +51,9 @@ namespace nil::xalt
     };
 
     template <literal T>
-    static constexpr const auto& literal_v = literal_type<T>::value;
+    inline constexpr const auto& literal_v = literal_type<T>::value;
     template <literal T>
-    static constexpr const auto& literal_sv = literal_type<T>::value_sv;
+    inline constexpr const auto& literal_sv = literal_type<T>::value_sv;
 
     template <literal... T>
     consteval auto concat() -> literal<(1 + ... + (sizeof(T) - 1))>

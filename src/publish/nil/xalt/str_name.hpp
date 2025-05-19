@@ -1,39 +1,73 @@
 #pragma once
 
-#include "detail/tparam_name.hpp"
 #include "literal.hpp"
 
 namespace nil::xalt
 {
-    template <typename T>
-    struct str_name_type final
+    namespace detail
     {
-        static consteval auto name()
+        template <literal U>
+        static consteval auto pretty_function()
         {
-            // this is to be replaced when reflection is available
-            return detail::tparam_name<__PRETTY_FUNCTION__>();
-        }
-    };
+            using type = literal_type<U>;
+            constexpr auto pretty_print = std::string_view(type::value);
 
-    template <auto T>
-    struct str_name_value final
+            // +2 is to move the starting position to the start of YourType
+            constexpr auto pos1 = pretty_print.find_first_of('=') + 2;
+            constexpr auto pos2 = pretty_print.find_first_of(']', pos1);
+
+            // +1 is for the null character
+            return literal<pos2 - pos1 + 1>(pretty_print.data(), pos1);
+        }
+
+        template <literal U>
+        static consteval auto funcsig()
+        {
+            using type = literal_type<U>;
+            constexpr auto pretty_print = std::string_view(type::value);
+
+            constexpr auto p = pretty_print.find_first_of('<');
+            constexpr auto f = pretty_print.find("<enum ", p);
+
+            constexpr auto pos1 = p + (f == p ? 6 : 1);
+            constexpr auto pos2 = pretty_print.find_first_of('>', pos1);
+            return literal<pos2 - pos1 + 1>(pretty_print.data(), pos1);
+        }
+    }
+
+    template <typename T>
+    consteval auto str_name_type()
     {
-        static consteval auto name()
-        {
-            // this is to be replaced when reflection is available
-            return detail::tparam_name<__PRETTY_FUNCTION__>();
-        }
-    };
-
-    template <typename T>
-    static constexpr const auto& str_name_type_v = literal_v<str_name_type<T>::name()>;
-
-    template <typename T>
-    static constexpr const auto& str_name_type_sv = literal_sv<str_name_type<T>::name()>;
+#if defined(__clang__) || defined(__GNUC__)
+        return detail::pretty_function<__PRETTY_FUNCTION__>();
+#elif defined(_MSC_VER)
+        return detail::funcsig<__FUNCSIG__>();
+#else
+        return "not supported";
+#endif
+    }
 
     template <auto T>
-    static constexpr const auto& str_name_value_v = literal_v<str_name_value<T>::name()>;
+    consteval auto str_name_value()
+    {
+#if defined(__clang__) || defined(__GNUC__)
+        return detail::pretty_function<__PRETTY_FUNCTION__>();
+#elif defined(_MSC_VER)
+        return detail::funcsig<__FUNCSIG__>();
+#else
+        return "not supported";
+#endif
+    }
+
+    template <typename T>
+    inline constexpr const auto& str_name_type_v = literal_v<str_name_type<T>()>;
+
+    template <typename T>
+    inline constexpr const auto& str_name_type_sv = literal_sv<str_name_type<T>()>;
 
     template <auto T>
-    static constexpr const auto& str_name_value_sv = literal_sv<str_name_value<T>::name()>;
+    inline constexpr const auto& str_name_value_v = literal_v<str_name_value<T>()>;
+
+    template <auto T>
+    inline constexpr const auto& str_name_value_sv = literal_sv<str_name_value<T>()>;
 }
