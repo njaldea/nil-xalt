@@ -14,7 +14,7 @@ enum class ETest
 
 TEST(str_enum, increment)
 {
-    using actual_values = enum_values<ETest>;
+    using actual_values = str_enum_values_t<ETest>;
     using expected_values = tlist_values<ETest::A, ETest::B, ETest::C>;
     static_assert((std::is_same_v<actual_values, expected_values>));
 
@@ -32,15 +32,9 @@ enum class EMaskedTest
     D = 0b1 << 4  // 16 not listed since there is a gap
 };
 
-template <>
-struct nil::xalt::str_enum_scan<EMaskedTest>
-{
-    static constexpr auto predicate = &nil::xalt::detail::scan::mask<EMaskedTest>;
-};
-
 TEST(str_enum, mask)
 {
-    using actual_values = enum_values<EMaskedTest>;
+    using actual_values = str_enum_values_t<EMaskedTest>;
     using expected_values = tlist_values<EMaskedTest::A, EMaskedTest::B, EMaskedTest::C>;
     static_assert((std::is_same_v<actual_values, expected_values>));
 
