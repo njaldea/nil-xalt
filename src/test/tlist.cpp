@@ -1,8 +1,15 @@
 #include <nil/xalt/tlist.hpp>
 
 #include <gtest/gtest.h>
+#include <type_traits>
 
 using namespace nil::xalt;
+
+template <auto T, auto V>
+struct is_same
+{
+    static constexpr auto value = std::is_same_v<decltype(T), decltype(V)> && T == V;
+};
 
 TEST(tlist, types)
 {
@@ -23,6 +30,10 @@ TEST(tlist, types)
     {
         static_assert(std::is_same_v<type::at<0>, int>);
         static_assert(std::is_same_v<type::at<1>, bool>);
+    }
+    {
+        static_assert(!type::any_of<std::is_same, float>);
+        static_assert(type::any_of<std::is_same, bool>);
     }
 }
 
@@ -47,5 +58,9 @@ TEST(tlist, values)
         static_assert(type::at<0> == 1);
         static_assert(type::at<1> == 5);
         static_assert(type::at<2> == 8);
+    }
+    {
+        static_assert(!type::any_of<is_same, 2>);
+        static_assert(type::any_of<is_same, 5>);
     }
 }

@@ -36,6 +36,12 @@ namespace nil::xalt
         template <std::size_t I>
             requires(size > I)
         using at = typename tlist_type_at<I, T...>::type;
+
+        template <template <typename, typename...> typename P, typename... C>
+        static constexpr auto any_of = (P<T, C...>::value || ... || false);
+
+        template <template <typename, typename...> typename P, typename... C>
+        static constexpr auto all_of = (P<T, C...>::value && ... && false);
     };
 
     template <typename T>
@@ -81,6 +87,12 @@ namespace nil::xalt
         template <std::size_t I>
             requires(size > I)
         static constexpr auto at = tlist_value_at<I, T...>::value;
+
+        template <template <auto, auto...> typename P, auto... C>
+        static constexpr auto any_of = (P<T, C...>::value || ... || false);
+
+        template <template <auto, auto...> typename P, auto... C>
+        static constexpr auto all_of = (P<T, C...>::value && ... && false);
     };
 
     template <typename T>
