@@ -48,7 +48,7 @@ namespace nil::xalt
             && has_single_bit<decltype(v)(str_enum_start_v<T>)> // first should have only 1 bit
             && has_single_bit<decltype(v)(v)>;                  // current should have only 1 bit
 
-        template <auto v>
+        template <typename T, T v>
         constexpr auto next()
         {
             using type = decltype(v);
@@ -64,7 +64,7 @@ namespace nil::xalt
             }
             else
             {
-                return str_enum_start<type>::value;
+                return str_enum_start_v<type>;
             }
         }
 
@@ -72,14 +72,14 @@ namespace nil::xalt
         struct values;
 
         template <typename T, T... L, T I>
-            requires(str_enum_start<T>::value != I)
+            requires(str_enum_start_v<T> != I)
         struct values<T, tlist_values<L...>, I>
         {
-            using type = typename values<T, tlist_values<L..., T(I)>, next<I>()>::type;
+            using type = typename values<T, tlist_values<L..., T(I)>, next<T, I>()>::type;
         };
 
         template <typename T, typename U, T I>
-            requires(str_enum_start<T>::value == I)
+            requires(str_enum_start_v<T> == I)
         struct values<T, U, I>
         {
             using type = U;
@@ -89,16 +89,11 @@ namespace nil::xalt
     template <typename T>
     struct str_enum_values
     {
-        static constexpr auto start = str_enum_start_v<T>;
-        static_assert(std::is_same_v<std::remove_cvref_t<decltype(start)>, T>);
-        using type = typename detail::values<T, tlist_values<start>, detail::next<start>()>::type;
-    };
-
-    template <typename T>
-        requires(!detail::is_valid_enum<str_enum_start_v<T>>)
-    struct str_enum_values<T>
-    {
-        using type = tlist_values<>;
+        static_assert(detail::is_valid_enum<str_enum_start_v<T>>);
+        using type = typename detail::values< //
+            T,
+            tlist_values<str_enum_start_v<T>>,
+            detail::next<T, str_enum_start_v<T>>()>::type;
     };
 
     template <typename T>

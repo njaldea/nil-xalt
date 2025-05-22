@@ -25,17 +25,17 @@ TEST(literal, find_first)
 {
     {
         // found
-        const auto result = find_first<"hello", "l", 0>();
+        const auto result = find_first<"hello", "l">();
         EXPECT_EQ(result, 2);
     }
     {
         // found
-        const auto result = find_first<"hello", "e", 0>();
+        const auto result = find_first<"hello", "e">();
         EXPECT_EQ(result, 1);
     }
     {
         // not found
-        const auto result = find_first<"hello", "a", 0>();
+        const auto result = find_first<"hello", "a">();
         EXPECT_EQ(result, 6);
     }
 }
