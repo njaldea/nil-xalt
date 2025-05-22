@@ -124,23 +124,13 @@ int main()
     {
         using namespace nil::xalt;
         using namespace nil::xalt::detail;
-        static_assert(0b00000 == pow_2(0));
-        static_assert(0b00001 == pow_2(1));
-        static_assert(0b00010 == pow_2(2));
-        static_assert(0b00100 == pow_2(3));
-        static_assert(0b01000 == pow_2(4));
-        static_assert(0b10000 == pow_2(5));
-        static_assert(0b00000 == make_mask(0));
-        static_assert(0b00001 == make_mask(1));
-        static_assert(0b00011 == make_mask(2));
-        static_assert(0b00111 == make_mask(3));
-        static_assert(0b01111 == make_mask(4));
-        static_assert(0b11111 == make_mask(5));
         using B = nil::xalt::noisy_type<"B">;
+
         using A = nil::xalt::noisy_type<"A", B&, const B&>;
+
         auto b = B();
         const auto& [a, ua, sa] = std::make_tuple( //
-            nil::xalt::fn_make<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
+            nil::xalt::fn_make<A>("dsd", 2, "std", 1, b, "asd", B(), b, B()),
             nil::xalt::fn_make_unique<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
             nil::xalt::fn_make_shared<A>(2, "std", 1, b, B(), "asd", "dsad", "hello")
         );

@@ -3,7 +3,8 @@ add_test_executable(
     literal.cpp
     str_enum.cpp
     str_name.cpp
-    tlist.cpp
+    tlist_types.cpp
+    tlist_values.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME})

@@ -1,40 +1,41 @@
 #pragma once
 
+#if !defined(__clang__) && !defined(__GNUC__) && !defined(_MSC_VER)
+#include "errors.hpp"
+#endif
 #include "literal.hpp"
+
+namespace nil::xalt::detail
+{
+    template <literal U>
+    static consteval auto pretty_function()
+    {
+        constexpr auto pretty_print = literal_sv<U>;
+
+        // +2 is to move the starting position to the start of YourType
+        constexpr auto pos1 = pretty_print.find_first_of('=') + 2;
+        constexpr auto pos2 = pretty_print.find_last_of(']');
+
+        // +1 is for the null character
+        return literal<pos2 - pos1 + 1>(pretty_print.data(), pos1);
+    }
+
+    template <literal U>
+    static consteval auto funcsig()
+    {
+        constexpr auto pretty_print = literal_sv<U>;
+
+        constexpr auto p = pretty_print.find_first_of('<');
+        constexpr auto f = pretty_print.find("<enum ", p);
+
+        constexpr auto pos1 = p + (f == p ? 6 : 1);
+        constexpr auto pos2 = pretty_print.find_last_of('>');
+        return literal<pos2 - pos1 + 1>(pretty_print.data(), pos1);
+    }
+}
 
 namespace nil::xalt
 {
-    namespace detail
-    {
-        template <literal U>
-        static consteval auto pretty_function()
-        {
-            using type = literal_type<U>;
-            constexpr auto pretty_print = std::string_view(type::value);
-
-            // +2 is to move the starting position to the start of YourType
-            constexpr auto pos1 = pretty_print.find_first_of('=') + 2;
-            constexpr auto pos2 = pretty_print.find_first_of(']', pos1);
-
-            // +1 is for the null character
-            return literal<pos2 - pos1 + 1>(pretty_print.data(), pos1);
-        }
-
-        template <literal U>
-        static consteval auto funcsig()
-        {
-            using type = literal_type<U>;
-            constexpr auto pretty_print = std::string_view(type::value);
-
-            constexpr auto p = pretty_print.find_first_of('<');
-            constexpr auto f = pretty_print.find("<enum ", p);
-
-            constexpr auto pos1 = p + (f == p ? 6 : 1);
-            constexpr auto pos2 = pretty_print.find_first_of('>', pos1);
-            return literal<pos2 - pos1 + 1>(pretty_print.data(), pos1);
-        }
-    }
-
     template <typename T>
     consteval auto str_name_type()
     {
@@ -43,6 +44,7 @@ namespace nil::xalt
 #elif defined(_MSC_VER)
         return detail::funcsig<__FUNCSIG__>();
 #else
+        undefined<T>();
         return "not supported";
 #endif
     }
@@ -55,6 +57,7 @@ namespace nil::xalt
 #elif defined(_MSC_VER)
         return detail::funcsig<__FUNCSIG__>();
 #else
+        undefined<T>();
         return "not supported";
 #endif
     }

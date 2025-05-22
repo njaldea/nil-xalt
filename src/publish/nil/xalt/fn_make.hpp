@@ -8,38 +8,35 @@
 #include <type_traits>
 #include <utility>
 
+#include "tlist_values.hpp"
+
 namespace nil::xalt::detail
 {
-    consteval auto pow_2(std::size_t value) -> std::size_t
+    template <std::size_t value>
+    consteval auto make_mask() -> std::size_t
     {
-        return value == 0 ? 0 : 1 << (value - 1);
+        return value == 0 ? 0 : (std::size_t(1) << (value)) - 1;
     }
 
-    consteval auto make_mask(std::size_t value) -> std::size_t
+    struct not_hit
     {
-        return value == 0 ? pow_2(value) : pow_2(value) | make_mask(value - 1);
-    }
-
-    template <std::size_t M, typename I = std::index_sequence<>, typename O = std::index_sequence<>>
-    struct index_masked;
-
-    template <std::size_t M, std::size_t IA, std::size_t... I, std::size_t... O>
-    struct index_masked<M, std::index_sequence<IA, I...>, std::index_sequence<O...>>
-        : std::conditional_t<
-              (pow_2(IA + 1) & M) == pow_2(IA + 1),
-              index_masked<M, std::index_sequence<I...>, std::index_sequence<IA, O...>>,
-              index_masked<M, std::index_sequence<I...>, std::index_sequence<O...>>>
-    {
+        constexpr bool operator()(std::size_t value, std::size_t mask)
+        {
+            const auto bit = std::size_t(1) << value;
+            return (bit & mask) == bit;
+        }
     };
 
-    template <std::size_t M, std::size_t... O>
-    struct index_masked<M, std::index_sequence<>, std::index_sequence<O...>>
+    struct inverse
     {
-        using type = std::index_sequence<O...>;
+        constexpr std::size_t operator()(std::size_t value, std::size_t max)
+        {
+            return max - 1 - value;
+        }
     };
 
-    template <std::size_t M, std::size_t I>
-    using index_masked_t = typename index_masked<M, std::make_index_sequence<I>>::type;
+    template <typename A, typename... Args>
+    struct make;
 
     template <typename A, typename... Args>
     struct make
@@ -47,17 +44,17 @@ namespace nil::xalt::detail
     public:
         static auto call(Args... args)
         {
-            return apply<detail::make_mask(sizeof...(Args))>(std::forward<Args>(args)...);
+            return apply<detail::make_mask<sizeof...(Args)>()>(std::forward<Args>(args)...);
         }
-
-        static constexpr bool value = (sizeof...(Args) < 64)
-            && !std::is_same_v<void, decltype(call(std::declval<Args>()...))>;
 
     private:
         template <std::size_t M>
         static auto apply(Args... args)
         {
-            using masked_type = index_masked_t<M, sizeof...(Args)>;
+            using masked_type                                                                 //
+                = typename xalt::to_tlist_values_t<std::make_index_sequence<sizeof...(Args)>> //
+                ::template remove_if<not_hit, M>::template apply<inverse, sizeof...(Args)>;
+
             constexpr auto is_compatible
                 = !std::is_same_v<void, decltype(create(masked_type(), std::declval<Args>()...))>;
             if constexpr (is_compatible)
@@ -71,7 +68,7 @@ namespace nil::xalt::detail
         }
 
         template <std::size_t... I>
-        static auto create(std::index_sequence<I...> /* i */, Args... args)
+        static auto create(tlist_values<I...> /* i */, Args... args)
         {
             using element_type = typename A::type;
             const auto t = std::make_tuple(explicit_cast<Args>{&args}...);
@@ -83,6 +80,18 @@ namespace nil::xalt::detail
             }
         }
     };
+
+    template <typename A, typename... Args>
+        requires(sizeof...(Args) >= 10)
+    struct make<A, Args...>
+    {
+        static_assert(sizeof...(Args) < 10); // only use with less than 10 arguments
+        static auto call(Args... args) = delete;
+    };
+
+    template <typename A, typename... Args>
+    concept maker_found
+        = !std::is_same_v<void, decltype(make<A, Args...>::call(std::declval<Args>()...))>;
 }
 
 namespace nil::xalt
@@ -124,11 +133,11 @@ namespace nil::xalt
     };
 
     template <typename A, typename... T>
-        requires(!detail::make<fn_make_strategy<A>, T && ...>::value)
+        requires(!detail::maker_found<fn_make_strategy<A>, T && ...>)
     auto fn_make(T&&... args) = delete;
 
     template <typename A, typename... T>
-        requires(detail::make<fn_make_strategy<A>, T && ...>::value)
+        requires(detail::maker_found<fn_make_strategy<A>, T && ...>)
     auto fn_make(T&&... args)
     {
         return detail::make<fn_make_strategy<A>, T&&...>::call(std::forward<T>(args)...);

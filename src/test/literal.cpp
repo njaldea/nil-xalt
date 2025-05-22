@@ -76,6 +76,11 @@ TEST(literal, replace_all)
         EXPECT_EQ(result, "ab__efg-ab__efg");
     }
     {
+        // found all (only one pass)
+        const auto result = literal_sv<replace_all<"abcdefg-abcdefg", "cd", "__cd">()>;
+        EXPECT_EQ(result, "ab__cdefg-ab__cdefg");
+    }
+    {
         // found none
         const auto result = literal_sv<replace_one<"abcdefg-abcdefg", "hi", "__">()>;
         EXPECT_EQ(result, "abcdefg-abcdefg");

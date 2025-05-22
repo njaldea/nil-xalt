@@ -9,7 +9,6 @@ namespace nil::xalt
     template <std::size_t N>
     struct literal final
     {
-    public:
         consteval literal(const char* init_value, std::size_t offset)
         {
             std::copy_n(&init_value[offset], N - 1, &private_value[0]);
@@ -35,16 +34,9 @@ namespace nil::xalt
     };
 
     template <literal T>
-    struct literal_type final
-    {
-        static constexpr const auto& value = T.private_value;
-        static constexpr const auto value_sv = std::string_view(T.private_value);
-    };
-
+    inline constexpr const auto& literal_v = T.private_value;
     template <literal T>
-    inline constexpr const auto& literal_v = literal_type<T>::value;
-    template <literal T>
-    inline constexpr const auto& literal_sv = literal_type<T>::value_sv;
+    inline constexpr const auto literal_sv = std::string_view(T.private_value);
 
     template <literal... T>
     consteval auto concat() -> literal<(1 + ... + (sizeof(T) - 1))>
@@ -52,7 +44,7 @@ namespace nil::xalt
         return literal<(1 + ... + (sizeof(T) - 1))>(T...);
     }
 
-    template <literal N, std::size_t offset, std::size_t size = sizeof(N)>
+    template <literal N, std::size_t offset, std::size_t size = sizeof(N) - offset>
     consteval auto substr() -> literal<size + 1>
     {
         static_assert(offset + size <= sizeof(N));
@@ -63,7 +55,14 @@ namespace nil::xalt
     consteval auto find_first() -> std::size_t
     {
         constexpr auto i = literal_sv<from>.find_first_of(literal_sv<to_find>);
-        return (i != std::string_view::npos) ? i : sizeof(from);
+        if constexpr (i == std::string_view::npos)
+        {
+            return sizeof(from);
+        }
+        else
+        {
+            return i;
+        }
     }
 
     template <literal from, literal to_find>
