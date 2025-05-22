@@ -41,7 +41,7 @@ namespace nil::xalt
         static constexpr auto any_of = (P<T, C...>::value || ... || false);
 
         template <template <typename, typename...> typename P, typename... C>
-        static constexpr auto all_of = (P<T, C...>::value && ... && false);
+        static constexpr auto all_of = (P<T, C...>::value && ... && true);
     };
 
     template <typename T>
@@ -92,7 +92,7 @@ namespace nil::xalt
         static constexpr auto any_of = (P<T, C...>::value || ... || false);
 
         template <template <auto, auto...> typename P, auto... C>
-        static constexpr auto all_of = (P<T, C...>::value && ... && false);
+        static constexpr auto all_of = (P<T, C...>::value && ... && true);
     };
 
     template <typename T>
