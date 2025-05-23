@@ -11,7 +11,7 @@ int foo()
 
     using free_type   = traits::free_type;      // R(Args...) -- void()
     using return_type = traits::return_type;    // R          -- void
-    using arg_types   = traits::arg_types;      // (Args...)  -- tlist_types<Args...>;
+    using arg_types   = traits::arg_types;      // (Args...)  -- tlist<Args...>;
     using class_type  = traits::class_type;     // void if not a member function
 
     static_assert(!traits::is_const);
@@ -21,4 +21,4 @@ int foo()
 
 ## Dependencies
 
-- [tlist_types](./04-tlist_types.md)
+- [tlist](./04-tlist.md)

@@ -2,7 +2,8 @@
 
 #include "literal.hpp"
 #include "str_name.hpp"
-#include "tlist_values.hpp"
+#include "tlist.hpp"
+#include "typed.hpp"
 
 #include <string_view>
 #include <type_traits>
@@ -12,9 +13,9 @@ namespace nil::xalt
     namespace detail
     {
         template <auto value>
-        concept is_valid_enum = starts_with<
-            str_name_value<value>(),
-            concat<str_name_type<decltype(value)>(), "::">()>();
+        constexpr auto is_valid_enum = starts_with<
+            nil::xalt::str_name<typify<value>>(),
+            concat<nil::xalt::str_name<decltype(value)>(), literal("::")>()>();
     }
 
     template <typename T>
@@ -73,9 +74,9 @@ namespace nil::xalt
 
         template <typename T, T... L, T I>
             requires(str_enum_start_v<T> != I)
-        struct values<T, tlist_values<L...>, I>
+        struct values<T, tlist<typify<L>...>, I>
         {
-            using type = typename values<T, tlist_values<L..., T(I)>, next<T, I>()>::type;
+            using type = typename values<T, tlist<typify<L>..., typify<T(I)>>, next<T, I>()>::type;
         };
 
         template <typename T, typename U, T I>
@@ -92,7 +93,7 @@ namespace nil::xalt
         static_assert(detail::is_valid_enum<str_enum_start_v<T>>);
         using type = typename detail::values< //
             T,
-            tlist_values<str_enum_start_v<T>>,
+            tlist<typify<str_enum_start_v<T>>>,
             detail::next<T, str_enum_start_v<T>>()>::type;
     };
 
@@ -102,12 +103,12 @@ namespace nil::xalt
     template <typename T>
     std::string_view str_enum(T enum_value)
     {
-        static constexpr auto each = []<T... v>(T value, tlist_values<v...>)
+        static constexpr auto each = []<T... v>(T value, tlist<typify<v>...>)
         {
             const char* name = nullptr;
-            (void)(                                                                //
-                (nullptr != (name = (value == v ? str_name_value_v<v> : nullptr))) //
-                || ...                                                             //
+            (void)(                                                                  //
+                (nullptr != (name = (value == v ? str_name_v<typify<v>> : nullptr))) //
+                || ...                                                               //
                 || (name = "-")
             );
             return name;

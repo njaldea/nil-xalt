@@ -2,11 +2,11 @@
 
 Contains utility templates to stringify enums.
 
-| Trait                     | Purpose                                 | Example                          |
-|---------------------------|-----------------------------------------|----------------------------------|
-| `str_enum_start<T>`       | Customize the first enum to inspect     | `ABC::A`                         |
-| `str_enum_values<T>`      | Override enum value scanning entirely   | `tlist_values<ABC::A, ABC::B>`   |
-| `str_enum(T)`             | Get string name or `"-"` fallback       | `"ABC::B"`                       |
+| Trait                     | Purpose                                 | Example                                     |
+|---------------------------|-----------------------------------------|---------------------------------------------|
+| `str_enum_start<T>`       | Customize the first enum to inspect     | `ABC::A`                                    |
+| `str_enum_values<T>`      | Override enum value scanning entirely   | `tlist<typify<ABC::A>, typify<ABC::B>>`     |
+| `str_enum(T)`             | Get string name or `"-"` fallback       | `"ABC::B"`                                  |
 
 ## nil::xalt::str_enum
 
@@ -81,12 +81,17 @@ To override the searching logic entirely, specialize the following:
 template <>
 struct nil::xalt::str_enum_values<ABC>
 {
-    using type = nil::xalt::tlist_values<ABC::A, ABC::B, ABC::C>;
+    using type = nil::xalt::tlist<
+        nil::xalt::typify<ABC::A>,
+        nil::xalt::typify<ABC::B>,
+        nil::xalt::typify<ABC::C>
+    >;
 };
 ```
 
 ## Dependencies
 
-- [literal](./03-literal.md.md)
-- [str_name](./06-str_name.md.md)
-- [tlist_values](./05-tlist_values.md.md)
+- [typed](./09-typed.md)
+- [tlist](./03-tlist.md)
+- [literal](./02-literal.md)
+- [str_name](./04-str_name.md)

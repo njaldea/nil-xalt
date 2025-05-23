@@ -13,7 +13,7 @@ namespace nil::xalt
         explicit noisy_type(T&&... /*t*/)
         {
             std::printf("%s: constructor\n", literal_v<lit>);
-            (std::printf("  - %s\n", str_name_type_v<T>), ...);
+            (std::printf("  - %s\n", str_name_v<T>), ...);
         }
 
         ~noisy_type()

@@ -10,11 +10,9 @@ A grab-bag of small utilities that don’t fit into any specific module.
     - [nil::xalt::literal](./docs/02-literal.md#nilxaltliteral)
     - [operations](./docs/02-literal.md#operations)
 - tlist
-    - [nil::xalt::tlist_types](./docs/03-tlist_types.md#nilxalttlist_types)
-    - [nil::xalt::tlist_values](./docs/03-tlist_values.md#nilxalttlist_values)
+    - [nil::xalt::tlist](./docs/03-tlist.md#nilxalttlist)
 - [str_name](./docs/04-str_name.md#str_name)
-    - [nil::xalt::str_name_type](./docs/04-str_name.md#nilxaltstr_name_type)
-    - [nil::xalt::str_name_value](./docs/04-str_name.md#nilxaltstr_name_value)
+    - [nil::xalt::str_name](./docs/04-str_name.md#nilxaltstr_name)
 - [str_enum](./docs/05-str_enum.md#str_enum)
     - [nil::xalt::str_enum](./docs/05-str_enum.md#nilxaltstr_enum)
     - [nil::xalt::str_enum_start](./docs/05-str_enum.md#nilxaltstr_enum_start)

@@ -15,7 +15,7 @@ enum class ETest
 TEST(str_enum, increment)
 {
     using actual_values = str_enum_values_t<ETest>;
-    using expected_values = tlist_values<ETest::A, ETest::B, ETest::C>;
+    using expected_values = tlist<typify<ETest::A>, typify<ETest::B>, typify<ETest::C>>;
     static_assert((std::is_same_v<actual_values, expected_values>));
 
     ASSERT_EQ(str_enum(ETest::A), "ETest::A");
@@ -35,7 +35,8 @@ enum class EMaskedTest
 TEST(str_enum, mask)
 {
     using actual_values = str_enum_values_t<EMaskedTest>;
-    using expected_values = tlist_values<EMaskedTest::A, EMaskedTest::B, EMaskedTest::C>;
+    using expected_values
+        = tlist<typify<EMaskedTest::A>, typify<EMaskedTest::B>, typify<EMaskedTest::C>>;
     static_assert((std::is_same_v<actual_values, expected_values>));
 
     ASSERT_EQ(str_enum(EMaskedTest::A), "EMaskedTest::A");

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tlist_types.hpp"
+#include "tlist.hpp"
 
 namespace nil::xalt
 {
@@ -25,7 +25,7 @@ namespace nil::xalt
         using free_type = R(Args...);
         using class_type = void;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = false;
         static constexpr auto is_noexcept = false;
     };
@@ -36,7 +36,7 @@ namespace nil::xalt
         using free_type = R(Args...) noexcept;
         using class_type = void;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = false;
         static constexpr auto is_noexcept = true;
     };
@@ -47,7 +47,7 @@ namespace nil::xalt
         using free_type = R(Args...);
         using class_type = C;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = false;
         static constexpr auto is_noexcept = false;
     };
@@ -58,7 +58,7 @@ namespace nil::xalt
         using free_type = R(Args...);
         using class_type = C;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = false;
     };
@@ -69,7 +69,7 @@ namespace nil::xalt
         using free_type = R(Args...) noexcept;
         using class_type = C;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = false;
         static constexpr auto is_noexcept = true;
     };
@@ -80,7 +80,7 @@ namespace nil::xalt
         using free_type = R(Args...) noexcept;
         using class_type = C;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = true;
     };
@@ -91,7 +91,7 @@ namespace nil::xalt
         using free_type = R(Args...);
         using class_type = void;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = false;
     };
@@ -102,7 +102,7 @@ namespace nil::xalt
         using free_type = R(Args...) noexcept;
         using class_type = void;
         using return_type = R;
-        using arg_types = tlist_types<Args...>;
+        using arg_types = tlist<Args...>;
         static constexpr auto is_const = true;
         static constexpr auto is_noexcept = true;
     };

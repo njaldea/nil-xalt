@@ -2,6 +2,12 @@
 
 namespace nil::xalt
 {
+    template <auto V>
+    struct typify
+    {
+        static constexpr auto value = V;
+    };
+
     template <typename T>
     inline constexpr char type_id_tag = '\0';
 

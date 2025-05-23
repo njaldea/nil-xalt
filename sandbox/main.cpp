@@ -7,7 +7,7 @@
 #include <nil/xalt/str_enum.hpp>
 #include <nil/xalt/str_name.hpp>
 #include <nil/xalt/transparent_stl.hpp>
-#include <nil/xalt/type_id.hpp>
+#include <nil/xalt/typed.hpp>
 
 #include <functional>
 #include <iostream>
@@ -98,9 +98,10 @@ int main()
     std::cout << literal_sv<replace_one<"abcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << literal_sv<replace_all<"abcdefghiabcdefghi", "def", "_njla_">()> << std::endl;
     std::cout << type().get_value() << std::endl;
-    std::cout << str_name_type_sv<type> << std::endl;
-    std::cout << str_name_value_sv<literal("asd")> << std::endl;
-    std::cout << str_name_value_sv<Zip::ABC> << std::endl;
+    std::cout << str_name_sv<type> << std::endl;
+    std::cout << str_name_sv<typify<literal("asd")>> << std::endl;
+    std::cout << str_name_sv<typify<Zip::ABC>> << std::endl;
+    std::cout << str_name_sv<typify<Zip(100)>> << std::endl;
     std::cout << nil::xalt::str_enum(Zip::DEF) << std::endl;
 
     check<false>(&foo);
