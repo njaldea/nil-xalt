@@ -19,8 +19,8 @@ using seq = std::make_index_sequence<3>;             // std::index_sequence<0,1,
 using typed_seq = nil::xalt::to_tlist_t<seq>;        // tlist<typify<0>, typify<1>, typify<2>>
 
 // Access the value
-static_assert(typify<42>::value == 42);                   // Using function call syntax
-static_assert(static_cast<int>(typify<42>::value) == 42); // Using conversion operator
+static_assert(typify<42>::value == 42);
+static_assert(static_cast<int>(typify<42>::value) == 42);
 ```
 
 ## nil::xalt::type_id

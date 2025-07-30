@@ -13,9 +13,7 @@ namespace nil::xalt
     namespace detail
     {
         template <auto value>
-        constexpr auto is_valid_enum = starts_with<
-            nil::xalt::str_name<typify<value>>(),
-            concat<nil::xalt::str_name<decltype(value)>(), literal("::")>()>();
+        constexpr auto is_valid_enum = !starts_with<nil::xalt::str_name<typify<value>>(), "(">();
     }
 
     template <typename T>
@@ -109,6 +107,22 @@ namespace nil::xalt
             (void)(                                                                  //
                 (nullptr != (name = (value == v ? str_name_v<typify<v>> : nullptr))) //
                 || ...                                                               //
+                || (name = "-")
+            );
+            return name;
+        };
+        return each(enum_value, str_enum_values_t<T>());
+    }
+
+    template <typename T>
+    std::string_view str_short_enum(T enum_value)
+    {
+        static constexpr auto each = []<T... v>(T value, tlist<typify<v>...>)
+        {
+            const char* name = nullptr;
+            (void)(                                                                        //
+                (nullptr != (name = (value == v ? str_short_name_v<typify<v>> : nullptr))) //
+                || ...                                                                     //
                 || (name = "-")
             );
             return name;

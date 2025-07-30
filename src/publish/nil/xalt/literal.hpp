@@ -33,6 +33,15 @@ namespace nil::xalt
         char private_value[N] = {};
     };
 
+    namespace literals
+    {
+        template <literal l>
+        consteval auto operator""_lit()
+        {
+            return l;
+        }
+    }
+
     template <literal T>
     inline constexpr const auto& literal_v = T.private_value;
     template <literal T>

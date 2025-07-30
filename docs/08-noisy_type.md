@@ -20,7 +20,19 @@ int main()
 }
 ```
 
+## Tracked Operations
+
+The following special member functions are tracked and logged:
+
+- Default constructor
+- Copy constructor  
+- Move constructor
+- Copy assignment operator
+- Move assignment operator
+- Destructor
+- Parameterized constructors (with argument type names)
+
 ## Dependencies
 
-- [literal](./03-literal.md)
-- [str_name](./06-str_name.md)
+- [literal](./02-literal.md)
+- [str_name](./04-str_name.md)

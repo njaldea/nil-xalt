@@ -52,6 +52,10 @@ There are two types of enums, *counting* and *masking*.
 
 If the value can be converted into the target enum type and matches a known enumerator name, it is considered valid.
 
+## nil::xalt::str_short_enum
+
+This method strips away the scope of the enum name
+
 ## nil::xalt::str_enum_start
 
 To override the first enum value, specialize the following:

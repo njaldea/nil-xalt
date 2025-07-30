@@ -102,7 +102,7 @@ int main()
     std::cout << str_name_sv<typify<literal("asd")>> << std::endl;
     std::cout << str_name_sv<typify<Zip::ABC>> << std::endl;
     std::cout << str_name_sv<typify<Zip(100)>> << std::endl;
-    std::cout << nil::xalt::str_enum(Zip::DEF) << std::endl;
+    // std::cout << nil::xalt::str_enum(Zip::DEF) << std::endl;
 
     check<false>(&foo);
     check<true>(&foo_n);
