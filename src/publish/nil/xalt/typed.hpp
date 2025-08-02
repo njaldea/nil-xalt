@@ -3,7 +3,7 @@
 namespace nil::xalt
 {
     template <auto V>
-    struct typify
+    struct typify final
     {
         static constexpr auto value = V;
     };

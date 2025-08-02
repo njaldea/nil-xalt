@@ -14,14 +14,14 @@ namespace nil::xalt
     struct tlist_at;
 
     template <std::size_t I, typename First, typename... T>
-    struct tlist_at<I, First, T...>
+    struct tlist_at<I, First, T...> final
     {
         static_assert(I < sizeof...(T) + 1, "Index out of bounds");
         using type = typename tlist_at<I - 1, T...>::type;
     };
 
     template <typename First, typename... T>
-    struct tlist_at<0, First, T...>
+    struct tlist_at<0, First, T...> final
     {
         using type = First;
     };
@@ -64,13 +64,13 @@ namespace nil::xalt
     struct to_tlist;
 
     template <template <typename...> typename T, typename... U>
-    struct to_tlist<T<U...>>
+    struct to_tlist<T<U...>> final
     {
         using type = tlist<U...>;
     };
 
     template <typename T, T... U>
-    struct to_tlist<std::integer_sequence<T, U...>>
+    struct to_tlist<std::integer_sequence<T, U...>> final
     {
         using type = tlist<typify<U>...>;
     };
@@ -85,7 +85,7 @@ namespace nil::xalt
         template <typename, typename...>
         typename C,
         typename... T>
-    struct tlist_remove_if<tlist<IA, I...>, tlist<O...>, C, T...>
+    struct tlist_remove_if<tlist<IA, I...>, tlist<O...>, C, T...> final
     {
         using type = std::conditional_t<
             C<IA, T...>::value,
@@ -94,7 +94,7 @@ namespace nil::xalt
     };
 
     template <typename... O, template <typename, typename...> typename C, typename... T>
-    struct tlist_remove_if<tlist<>, tlist<O...>, C, T...>
+    struct tlist_remove_if<tlist<>, tlist<O...>, C, T...> final
     {
         using type = tlist<O...>;
     };

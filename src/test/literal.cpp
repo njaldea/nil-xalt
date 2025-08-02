@@ -25,17 +25,36 @@ TEST(literal, find_first)
 {
     {
         // found
-        const auto result = find_first<"hello", "l">();
+        const auto result = find<"hello", "l">();
         EXPECT_EQ(result, 2);
     }
     {
         // found
-        const auto result = find_first<"hello", "e">();
+        const auto result = find<"hello", "e">();
         EXPECT_EQ(result, 1);
     }
     {
         // not found
-        const auto result = find_first<"hello", "a">();
+        const auto result = find<"hello", "a">();
+        EXPECT_EQ(result, 6);
+    }
+}
+
+TEST(literal, find_last)
+{
+    {
+        // found
+        const auto result = rfind<"hello", "l">();
+        EXPECT_EQ(result, 3);
+    }
+    {
+        // found
+        const auto result = rfind<"hello", "e">();
+        EXPECT_EQ(result, 1);
+    }
+    {
+        // not found
+        const auto result = rfind<"hello", "a">();
         EXPECT_EQ(result, 6);
     }
 }
@@ -50,6 +69,20 @@ TEST(literal, starts_with)
     {
         // not found
         const auto result = starts_with<"hello", "el">();
+        EXPECT_EQ(result, false);
+    }
+}
+
+TEST(literal, ends_with)
+{
+    {
+        // found
+        const auto result = ends_with<"hello", "lo">();
+        EXPECT_EQ(result, true);
+    }
+    {
+        // not found
+        const auto result = ends_with<"hello", "el">();
         EXPECT_EQ(result, false);
     }
 }
@@ -82,7 +115,7 @@ TEST(literal, replace_all)
     }
     {
         // found none
-        const auto result = literal_sv<replace_one<"abcdefg-abcdefg", "hi", "__">()>;
+        const auto result = literal_sv<replace_all<"abcdefg-abcdefg", "hi", "__">()>;
         EXPECT_EQ(result, "abcdefg-abcdefg");
     }
 }

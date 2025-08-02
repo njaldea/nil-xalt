@@ -53,64 +53,71 @@ namespace nil::xalt
         return literal<(1 + ... + (sizeof(T) - 1))>(T...);
     }
 
-    template <literal N, std::size_t offset, std::size_t size = sizeof(N) - offset>
-    consteval auto substr() -> literal<size + 1>
+    template <literal N, std::size_t pos, std::size_t count = sizeof(N) - pos>
+    consteval auto substr() -> literal<count + 1>
     {
-        static_assert(offset + size <= sizeof(N));
-        return literal<size + 1>(&N.private_value[0], offset);
+        static_assert(pos + count <= sizeof(N));
+        return literal<count + 1>(literal_v<N>, pos);
     }
 
     template <literal from, literal to_find>
-    consteval auto find_first() -> std::size_t
+    consteval auto find() -> std::size_t
     {
-        constexpr auto i = literal_sv<from>.find_first_of(literal_sv<to_find>);
-        if constexpr (i == std::string_view::npos)
-        {
-            return sizeof(from);
-        }
-        else
-        {
-            return i;
-        }
+        constexpr auto i = literal_sv<from>.find(literal_sv<to_find>);
+        return i == std::string_view::npos ? sizeof(from) : i;
+    }
+
+    template <literal from, literal to_find>
+    consteval auto rfind() -> std::size_t
+    {
+        constexpr auto i = literal_sv<from>.rfind(literal_sv<to_find>);
+        return i == std::string_view::npos ? sizeof(from) : i;
     }
 
     template <literal from, literal to_find>
     consteval auto starts_with() -> bool
     {
-        return find_first<substr<from, 0, sizeof(to_find)>(), to_find>() == 0;
+        return literal_sv<from>.starts_with(literal_sv<to_find>);
+    }
+
+    template <literal from, literal to_find>
+    consteval auto ends_with() -> bool
+    {
+        return literal_sv<from>.ends_with(literal_sv<to_find>);
+    }
+
+    template <literal base, literal from, literal to, std::size_t count>
+    consteval auto replace()
+    {
+        if constexpr (constexpr auto index1 = find<base, from>(); index1 != sizeof(base))
+        {
+            constexpr auto index2 = index1 + sizeof(from) - 1;
+            constexpr auto remaining_size = sizeof(base) - index2;
+            constexpr auto section1 = substr<base, 0, index1>();
+            constexpr auto section2 = substr<base, index2, remaining_size>();
+
+            if constexpr (count == 1) {
+                return concat<section1, to, section2>();
+            } else {
+                return concat<section1, to, replace<section2, from, to, count - 1>()>();
+            }
+        }
+        else
+        {
+            return base;
+        }
     }
 
     template <literal base, literal from, literal to>
     consteval auto replace_one()
     {
-        if constexpr (constexpr auto index1 = find_first<base, from>(); index1 != sizeof(base))
-        {
-            constexpr auto index2 = index1 + sizeof(from) - 1;
-            constexpr auto remaining_size = sizeof(base) - index2;
-            constexpr auto section1 = substr<base, 0, index1>();
-            constexpr auto section2 = substr<base, index2, remaining_size>();
-            return concat<section1, to, section2>();
-        }
-        else
-        {
-            return base;
-        }
+        return replace<base, from, to, 1>();
     }
+
 
     template <literal base, literal from, literal to>
     consteval auto replace_all()
     {
-        if constexpr (constexpr auto index1 = find_first<base, from>(); index1 != sizeof(base))
-        {
-            constexpr auto index2 = index1 + sizeof(from) - 1;
-            constexpr auto remaining_size = sizeof(base) - index2;
-            constexpr auto section1 = substr<base, 0, index1>();
-            constexpr auto section2 = substr<base, index2, remaining_size>();
-            return concat<section1, to, replace_all<section2, from, to>()>();
-        }
-        else
-        {
-            return base;
-        }
+        return replace<base, from, to, 0xFFFFFFFF>();
     }
 }

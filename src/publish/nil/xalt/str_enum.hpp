@@ -72,21 +72,21 @@ namespace nil::xalt
 
         template <typename T, T... L, T I>
             requires(str_enum_start_v<T> != I)
-        struct values<T, tlist<typify<L>...>, I>
+        struct values<T, tlist<typify<L>...>, I> final
         {
             using type = typename values<T, tlist<typify<L>..., typify<T(I)>>, next<T, I>()>::type;
         };
 
         template <typename T, typename U, T I>
             requires(str_enum_start_v<T> == I)
-        struct values<T, U, I>
+        struct values<T, U, I> final
         {
             using type = U;
         };
     }
 
     template <typename T>
-    struct str_enum_values
+    struct str_enum_values final
     {
         static_assert(detail::is_valid_enum<str_enum_start_v<T>>);
         using type = typename detail::values< //

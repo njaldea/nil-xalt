@@ -7,7 +7,7 @@
 
 namespace nil::xalt
 {
-    struct transparent_umap_hash
+    struct transparent_umap_hash final
     {
         using is_transparent = void;
 
@@ -17,7 +17,7 @@ namespace nil::xalt
         }
     };
 
-    struct transparent_umap_equal
+    struct transparent_umap_equal final
     {
         using is_transparent = void;
 

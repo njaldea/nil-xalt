@@ -21,7 +21,7 @@ namespace nil::xalt::detail
     struct not_hit;
 
     template <auto V, auto M>
-    struct not_hit<typify<V>, typify<M>>
+    struct not_hit<typify<V>, typify<M>> final
     {
         static constexpr auto value = ((std::size_t(1) << V) & M) == 0;
     };
@@ -30,13 +30,13 @@ namespace nil::xalt::detail
     struct inverse;
 
     template <auto V, auto M>
-    struct inverse<typify<V>, typify<M>>
+    struct inverse<typify<V>, typify<M>> final
     {
         using type = typify<M - 1 - V>;
     };
 
     template <typename A, typename... Args>
-    struct make
+    struct make final
     {
     public:
         static auto call(Args... args)
@@ -81,7 +81,7 @@ namespace nil::xalt::detail
 
     template <typename A, typename... Args>
         requires(sizeof...(Args) >= 10)
-    struct make<A, Args...>
+    struct make<A, Args...> final
     {
         static_assert(sizeof...(Args) < 10); // only use with less than 10 arguments
         static auto call(Args... args) = delete;
@@ -107,7 +107,7 @@ namespace nil::xalt
     };
 
     template <typename A>
-    struct fn_make_strategy<std::unique_ptr<A>>
+    struct fn_make_strategy<std::unique_ptr<A>> final
     {
         using type = A;
 
@@ -119,7 +119,7 @@ namespace nil::xalt
     };
 
     template <typename A>
-    struct fn_make_strategy<std::shared_ptr<A>>
+    struct fn_make_strategy<std::shared_ptr<A>> final
     {
         using type = A;
 
