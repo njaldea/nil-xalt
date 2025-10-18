@@ -36,7 +36,7 @@ namespace nil::xalt
     namespace literals
     {
         template <literal l>
-        consteval auto operator""_lit()
+        consteval const auto& operator""_lit()
         {
             return l;
         }
