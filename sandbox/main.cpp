@@ -51,13 +51,13 @@ struct bar
     void foo_n_c() const noexcept;
 };
 
-template <bool nc, typename T>
+template <bool nc, bool cc, typename T>
 void check(T /* t */)
 {
     using nil::xalt::fn_sign;
     static_assert(std::is_same_v<typename fn_sign<T>::return_type, void>);
     static_assert(std::is_same_v<typename fn_sign<T>::class_type, void>);
-    static_assert(fn_sign<T>::is_const);
+    static_assert(fn_sign<T>::is_const == cc);
     static_assert(fn_sign<T>::is_noexcept == nc);
 }
 
@@ -103,10 +103,14 @@ int main()
     std::cout << str_name_sv<typify<literal("asd")>> << std::endl;
     std::cout << str_name_sv<typify<Zip::ABC>> << std::endl;
     std::cout << str_name_sv<typify<Zip(100)>> << std::endl;
+
+    using t1 = tlist<int, bool, char>;
+    using t2 = tlist<>::join<tlist<int>, tlist<bool>, tlist<char>>;
+    static_assert(std::is_same_v<t1, t2>);
     // std::cout << nil::xalt::str_enum(Zip::DEF) << std::endl;
 
-    check<false>(&foo);
-    check<true>(&foo_n);
+    check<false, false>(&foo);
+    check<true, false>(&foo_n);
     bar_check<false, false>(&bar::foo);
     bar_check<false, true>(&bar::foo_c);
     bar_check<true, false>(&bar::foo_n);
@@ -126,16 +130,11 @@ int main()
     {
         using namespace nil::xalt;
         using namespace nil::xalt::detail;
-        using B = nil::xalt::noisy_type<"B">;
-
-        using A = nil::xalt::noisy_type<"A", B&, const B&>;
-
-        auto b = B();
-        const auto& [a, ua, sa] = std::make_tuple( //
-            nil::xalt::fn_make<A>("dsd", 2, "std", 1, b, "asd", B(), b, B()),
-            nil::xalt::fn_make_unique<A>(2, "std", 1, b, B(), "asd", "dsad", "hello"),
-            nil::xalt::fn_make_shared<A>(2, "std", 1, b, B(), "asd", "dsad", "hello")
-        );
+        using C = nil::xalt::noisy_type<"C", int, float>;
+        nil::xalt::fn_make<C>(false, 30, 0.2F, 20, 0.3F);
+        const auto result
+            = nil::xalt::fn_call(+[](bool v) { return v ? 11 : 10; }, 1, false, 'b', true);
+        std::cout << "abc: " << result << std::endl;
     }
     return 0;
 }

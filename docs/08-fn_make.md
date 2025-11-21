@@ -57,7 +57,8 @@ The algorithm uses bit masking to try different combinations:
 
 ## Dependencies
 
-- [cast](./11-cast.md) - For argument type conversion
+- [fn_call](./07-fn_call.md) - Argument subset search and invocation engine
+- [cast](./12-cast.md) - For argument type conversion during probing
 - [tlist](./03-tlist.md) - For argument type manipulation
 
 ## Notes

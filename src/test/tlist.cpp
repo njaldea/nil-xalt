@@ -5,14 +5,6 @@
 
 using namespace nil::xalt;
 
-struct is_same
-{
-    constexpr bool operator()(auto l, auto r)
-    {
-        return std::is_same_v<decltype(l), decltype(r)> && l == r;
-    }
-};
-
 TEST(tlist, types)
 {
     using type = tlist<int, bool>;

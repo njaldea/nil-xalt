@@ -62,7 +62,7 @@ int main()
 
 ## typify
 
-When using [typify](./09-typed.md#nilxalttypify), the str_name functions will extract the underlying value:
+When using [typify](./10-typed.md#nilxalttypify), the str_name functions will extract the underlying value:
 
 ```cpp
 static_assert(str_name_sv<typify<Status::Active>> == "Status::Active");
@@ -82,13 +82,13 @@ This functionality requires compiler-specific intrinsics:
 - **GCC/Clang**: Uses `__PRETTY_FUNCTION__`  
 - **MSVC**: Uses `__FUNCSIG__`
 
-If the compiler doesn't support these intrinsics, the functions will not be available and compilation will fail with appropriate error messages from the [errors](./10-errors.md) module.
+If the compiler doesn't support these intrinsics, the functions will not be available and compilation will fail with appropriate error messages from the [errors](./11-errors.md) module.
 
 ## Dependencies
 
 - [literal](./02-literal.md) - For compile-time string manipulation
-- [typed](./09-typed.md) - For `typify` support
-- [errors](./10-errors.md) - For unsupported compiler diagnostics
+- [typed](./10-typed.md) - For `typify` support
+- [errors](./11-errors.md) - For unsupported compiler diagnostics
 
 ## Notes
 

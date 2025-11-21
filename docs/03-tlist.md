@@ -24,9 +24,9 @@ The `tlist` class provides the following categories of operations:
 using as_tuple = my_types::cast<std::tuple>;        // std::tuple<int, bool, float>
 
 // Apply template to each type
-using ptrs = my_types::apply<std::add_pointer_>;    // tlist<int*, bool*, float*>
+using ptrs = my_types::apply<std::add_pointer_t>;   // tlist<int*, bool*, float*>
 // or
-using ptrs = my_types::apply_t<std::add_pointer>;   // tlist<int*, bool*, float*>
+using ptrs2 = my_types::apply_t<std::add_pointer>;  // tlist<int*, bool*, float*>
 ```
 
 ### Properties
@@ -43,17 +43,28 @@ using first_type = my_types::at<0>;  // int
 - `any_of` - Check if any type satisfies a predicate (false when empty)
 - `all_of` - Check if all types satisfy a predicate (true when empty)
 - `remove_if` - Create new list without types matching predicate
+- `join` - Create new list with all the types from other tlist types
 
 ```cpp
 using my_types = tlist<int, float, bool>;
 
-// Check if any type is integral
-// `std::is_floating_point` has `:value`
-static_assert(from_tuple::any_of<std::is_floating_point>);
-static_assert(!from_tuple::all_of<std::is_floating_point>);
+// Check for floating point types
+static_assert(my_types::any_of<std::is_floating_point>);
+static_assert(!my_types::all_of<std::is_floating_point>);
 
-// Remove non-integral types
-using integers = my_types::remove_if<is_floating_point>;        // tlist<int, bool>
+// Remove floating point types
+template <typename T>
+struct is_floating_point { static constexpr bool value = std::is_floating_point_v<T>; };
+
+using non_floats = my_types::remove_if<is_floating_point>;  // tlist<int, bool>
+
+// Join with another list
+using more = tlist<char, long>;
+using all = my_types::join<more>; // tlist<int, float, bool, char, long>
+
+// Predicates may take extra parameters via the C... pack
+static_assert(my_types::any_of<std::is_same, int>);
+using without_float = my_types::remove_if<std::is_same, float>; // tlist<int, bool>
 ```
 
 ### Type Conversion
@@ -77,8 +88,11 @@ template <typename T, typename U>
 struct is_same {
     static constexpr bool value = std::is_same_v<T, U>;
 };
+
+// Many standard type traits (e.g., std::is_same) can be used directly
+// since they already expose a ::value member.
 ```
 
 ## Dependencies
 
-- [typed](./09-typed.md)
+- [typed](./10-typed.md)

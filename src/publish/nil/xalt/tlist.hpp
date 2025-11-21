@@ -30,6 +30,9 @@ namespace nil::xalt
     struct tlist_remove_if;
 
     template <typename... T>
+    struct tlist_join;
+
+    template <typename... T>
     struct tlist final
     {
         template <template <typename...> typename U>
@@ -46,6 +49,9 @@ namespace nil::xalt
 
         template <template <typename, typename...> typename P, typename... C>
         using remove_if = typename tlist_remove_if<tlist<T...>, tlist<>, P, C...>::type;
+
+        template <typename... U>
+        using join = typename tlist_join<tlist<T...>, U...>::type;
 
         template <template <typename, typename...> typename P, typename... C>
         static constexpr auto any_of = (P<T, C...>::value || ... || false);
@@ -97,5 +103,17 @@ namespace nil::xalt
     struct tlist_remove_if<tlist<>, tlist<O...>, C, T...> final
     {
         using type = tlist<O...>;
+    };
+
+    template <typename... T1, typename... T2, typename... T>
+    struct tlist_join<tlist<T1...>, tlist<T2...>, T...> final
+    {
+        using type = typename tlist_join<tlist<T1..., T2...>, T...>::type;
+    };
+
+    template <typename... T1>
+    struct tlist_join<tlist<T1...>> final
+    {
+        using type = tlist<T1...>;
     };
 }

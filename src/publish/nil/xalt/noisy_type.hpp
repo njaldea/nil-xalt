@@ -3,17 +3,22 @@
 #include "literal.hpp"
 #include "str_name.hpp"
 
-#include <cstdio>
+#include <iostream>
 
 namespace nil::xalt
 {
     template <literal lit, typename... T>
     struct noisy_type final
     {
-        explicit noisy_type(T&&... /*t*/)
+        noisy_type()
         {
             std::printf("%s: constructor\n", literal_v<lit>);
-            (std::printf("  - %s\n", str_name_v<T>), ...);
+        }
+
+        explicit noisy_type(T&&... t)
+        {
+            std::printf("%s: constructor\n", literal_v<lit>);
+            ((std::cout << "  - " << str_name_v<T> << " : " << t << std::endl), ...);
         }
 
         ~noisy_type()

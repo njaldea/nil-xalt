@@ -92,7 +92,7 @@ namespace nil::xalt
         using class_type = void;
         using return_type = R;
         using arg_types = tlist<Args...>;
-        static constexpr auto is_const = true;
+        static constexpr auto is_const = false;
         static constexpr auto is_noexcept = false;
     };
 
@@ -103,7 +103,7 @@ namespace nil::xalt
         using class_type = void;
         using return_type = R;
         using arg_types = tlist<Args...>;
-        static constexpr auto is_const = true;
+        static constexpr auto is_const = false;
         static constexpr auto is_noexcept = true;
     };
 

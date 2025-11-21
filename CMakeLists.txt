@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27.1)
 
-project(nil-xalt VERSION 1.3.1 LANGUAGES CXX)
+project(nil-xalt VERSION 1.4.0 LANGUAGES CXX)
 
 include(cmake/package.cmake)
 include(cmake/toolchain.cmake)

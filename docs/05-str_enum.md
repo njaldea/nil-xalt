@@ -43,7 +43,7 @@ This works by doing the following:
 - if the value is not valid, *terminate the scan*
 - get the next candidate then repeat the process
 
-The next candidate is decided depending on the type of enum.
+The next candidate is decided depending on the type of enum, and the scan stops as soon as the next candidate isn’t a known enumerator.
 There are two types of enums, *counting* and *masking*.
 
 *counting* enums are those that have values increment by one.
@@ -55,6 +55,10 @@ If the value can be converted into the target enum type and matches a known enum
 ## nil::xalt::str_short_enum
 
 This method strips away the scope of the enum name
+
+```cpp
+std::puts(str_short_enum(ABC::B).data()); // B
+```
 
 ## nil::xalt::str_enum_start
 
@@ -95,7 +99,7 @@ struct nil::xalt::str_enum_values<ABC>
 
 ## Dependencies
 
-- [typed](./09-typed.md)
+- [typed](./10-typed.md)
 - [tlist](./03-tlist.md)
 - [literal](./02-literal.md)
 - [str_name](./04-str_name.md)
