@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.27.1)
 
-project(nil-xalt VERSION 1.4.0 LANGUAGES CXX)
+project(
+    nil-xalt
+    VERSION 1.4.1
+    LANGUAGES CXX
+    DESCRIPTION "collection of utility functionalities"
+)
 
-include(cmake/package.cmake)
-include(cmake/toolchain.cmake)
-include(cmake/quality.cmake)
-include(cmake/test.cmake)
-include(cmake/coverage.cmake)
-include(cmake/cpack.cmake)
+find_package(nil-cmake CONFIG REQUIRED)
+install_config("cmake/config.cmake.in")
 
 add_subdirectory(src)
 add_subdirectory(sandbox)
