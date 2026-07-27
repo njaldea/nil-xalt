@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.27.1)
 
 project(
     nil-xalt
-    VERSION 1.4.2
+    VERSION 1.4.3
     LANGUAGES CXX
     DESCRIPTION "collection of utility functionalities"
 )

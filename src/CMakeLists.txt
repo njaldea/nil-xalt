@@ -4,6 +4,7 @@ set(
     HEADERS
         publish/nil/xalt/cast.hpp
         publish/nil/xalt/checks.hpp
+        publish/nil/xalt/coalesce.hpp
         publish/nil/xalt/errors.hpp
         publish/nil/xalt/fn_call.hpp
         publish/nil/xalt/fn_make.hpp
