@@ -1,6 +1,8 @@
 # typed
 
-Contains utility templates containing unique identifier for a type.
+Contains utility templates for value-to-type wrapping and lightweight per-type IDs.
+
+Includes: `#include <nil/xalt/typed.hpp>`
 
 ## nil::xalt::typify
 
@@ -31,3 +33,8 @@ int main()
     constexpr const void* id = nil::xalt::type_id<int>;
 }
 ```
+
+Notes:
+- `type_id<T>` is the address of a type-specific inline tag object.
+- It is stable within a process for the same instantiated definition.
+- Like other address-based header-only IDs, cross-shared-library identity is not guaranteed.

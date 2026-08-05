@@ -28,6 +28,7 @@ int main()
 Notes:
 - Argument values are printed via `operator<<(std::ostream&, value)`, so they must be streamable.
 - Type names are derived using `str_name`, and the label uses the `literal` template parameter.
+- Constructor argument types are fixed by template parameters of `noisy_type<..., T...>`.
 
 ## Tracked Operations
 

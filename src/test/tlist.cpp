@@ -36,4 +36,13 @@ TEST(tlist, types)
         using filtered_2 = type::remove_if<std::is_same, bool>;
         static_assert(std::is_same_v<filtered_2, tlist<int>>);
     }
+    {
+        using duplicates = tlist<int, bool, int, float, bool, int>;
+        using dedupe_1 = duplicates::dedupe;
+        using dedupe_2 = tlist_dedupe_t<duplicates>;
+        using expected = tlist<int, bool, float>;
+
+        static_assert(std::is_same_v<dedupe_1, expected>);
+        static_assert(std::is_same_v<dedupe_2, expected>);
+    }
 }

@@ -6,7 +6,7 @@ Includes: `#include <nil/xalt/fn_call.hpp>`
 
 ## nil::xalt::fn_call
 
-Tries different argument combinations (dropping trailing arguments as needed) until a valid call is found. Uses lightweight casting probes to guide overload resolution, but forwards the original arguments as-is when calling.
+Tries different argument combinations until a valid call is found. Uses lightweight casting probes to guide overload resolution, but forwards the original arguments as-is when calling.
 
 Constraints:
 - Supports up to 8 call arguments (callable + args must be fewer than 10 template parameters internally).
@@ -35,9 +35,12 @@ int main() {
 ```
 
 ### How it works (brief)
-- Computes candidate subsets of the provided arguments using a bitmask scan.
+- Computes candidate subsets of the provided arguments using a descending bitmask scan.
 - Checks invocability using `implicit_cast<T>` during compile-time probing.
-- Calls the target with the original arguments in their natural order once a match is found.
+- Calls the target with the original arguments once a match is found.
+
+Notes:
+- Search preference is determined by mask order (larger masks first), not by overload ranking across all subsets.
 
 ## Dependencies
 

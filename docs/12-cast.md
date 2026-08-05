@@ -60,4 +60,4 @@ Notes:
 
 ## Where it’s used
 
-These wrappers are designed to be used by combinators like `fn_make` to try constructor candidates by selectively casting arguments during compile-time checks, without mutating the original arguments.
+These wrappers are designed to be used by combinators like `fn_make` and `fn_call` to probe call viability via selective casts, without mutating the original arguments.

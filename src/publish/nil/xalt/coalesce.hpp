@@ -7,7 +7,7 @@
             requires requires { typename U::ALIAS; }                                               \
         using alias = typename U::ALIAS;                                                           \
         using type = __VA_ARGS__;                                                                  \
-    };
+    }
 
 namespace nil::xalt
 {

@@ -10,8 +10,41 @@ add_executable(
     main.cpp
 )
 
+add_executable(
+    ${PROJECT_NAME}_str_name
+    str_name.cpp
+)
+
+add_executable(
+    ${PROJECT_NAME}_str_name_bench
+    str_name_bench.cpp
+)
+
+add_executable(
+    ${PROJECT_NAME}_str_enum_bench
+    str_enum_bench.cpp
+)
+
 target_link_libraries(
     ${PROJECT_NAME}
+    PRIVATE
+    xalt
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}_str_name
+    PRIVATE
+    xalt
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}_str_name_bench
+    PRIVATE
+    xalt
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}_str_enum_bench
     PRIVATE
     xalt
 )

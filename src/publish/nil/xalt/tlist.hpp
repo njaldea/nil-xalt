@@ -29,8 +29,14 @@ namespace nil::xalt
     template <typename I, typename O, template <typename, typename...> typename C, typename... T>
     struct tlist_remove_if;
 
+    template <typename T>
+    struct tlist_dedupe;
+
     template <typename... T>
     struct tlist_join;
+
+    template <typename I, typename O>
+    struct tlist_dedupe_impl;
 
     template <typename... T>
     struct tlist final
@@ -52,6 +58,8 @@ namespace nil::xalt
 
         template <typename... U>
         using join = typename tlist_join<tlist<T...>, U...>::type;
+
+        using dedupe = typename tlist_dedupe<tlist<T...>>::type;
 
         template <template <typename, typename...> typename P, typename... C>
         static constexpr auto any_of = (P<T, C...>::value || ... || false);
@@ -84,6 +92,15 @@ namespace nil::xalt
     template <typename T>
     using to_tlist_t = typename to_tlist<T>::type;
 
+    template <typename... T>
+    struct tlist_dedupe<tlist<T...>> final
+    {
+        using type = typename tlist_dedupe_impl<tlist<T...>, tlist<>>::type;
+    };
+
+    template <typename T>
+    using tlist_dedupe_t = typename tlist_dedupe<T>::type;
+
     template <
         typename IA,
         typename... I,
@@ -101,6 +118,21 @@ namespace nil::xalt
 
     template <typename... O, template <typename, typename...> typename C, typename... T>
     struct tlist_remove_if<tlist<>, tlist<O...>, C, T...> final
+    {
+        using type = tlist<O...>;
+    };
+
+    template <typename IA, typename... I, typename... O>
+    struct tlist_dedupe_impl<tlist<IA, I...>, tlist<O...>> final
+    {
+        using type = std::conditional_t<
+            tlist<O...>::template any_of<std::is_same, IA>,
+            typename tlist_dedupe_impl<tlist<I...>, tlist<O...>>::type,
+            typename tlist_dedupe_impl<tlist<I...>, tlist<O..., IA>>::type>;
+    };
+
+    template <typename... O>
+    struct tlist_dedupe_impl<tlist<>, tlist<O...>> final
     {
         using type = tlist<O...>;
     };

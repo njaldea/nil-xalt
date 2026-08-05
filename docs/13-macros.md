@@ -32,3 +32,4 @@ NIL_XALT_REPEAT_4(x)
 Notes:
 - These are low-level helpers; prefer normal C++ facilities where possible.
 - The supported arities are limited by the provided sequence (1..10).
+- `NIL_XALT_NARG(...)` supports counting 0 through 10 arguments.

@@ -84,78 +84,120 @@ namespace nil::xalt::detail
     consteval auto str_name_index() -> std::size_t
     {
         constexpr auto name_sv = literal_sv<T>;
-        constexpr auto is_templated = name_sv.ends_with('>');
-        auto angle_check = is_templated;
-        auto track = 0;
-        for (auto i = 0UL; i < name_sv.size(); ++i)
+        if constexpr (!name_sv.ends_with('>'))
         {
-            if (angle_check)
+            constexpr auto colon = rfind<T, ":">();
+            return colon == sizeof(T) ? 0UL : (colon + 1UL);
+        }
+
+        constexpr auto size = name_sv.size();
+        auto template_depth = 0;
+        for (auto pos = size; pos > 0UL; --pos)
+        {
+            const auto c = name_sv[pos - 1UL];
+
+            if (c == '>')
             {
-                if (name_sv[name_sv.size() - i - 1] == '>')
-                {
-                    track += 1;
-                }
-                if (name_sv[name_sv.size() - i - 1] == '<')
-                {
-                    track -= 1;
-                }
-                if (track == 0)
-                {
-                    angle_check = false;
-                }
+                template_depth += 1;
+                continue;
             }
-            else
+
+            if (c == '<')
             {
-                if (name_sv[name_sv.size() - i - 1] == ':')
-                {
-                    return name_sv.size() - i;
-                }
+                --template_depth;
+                continue;
+            }
+
+            if (template_depth == 0 && c == ':')
+            {
+                return pos;
             }
         }
         return 0UL;
     }
+
+    template <literal T>
+    consteval auto short_base_name_of()
+    {
+        constexpr auto sv = literal_sv<T>;
+        constexpr auto lt = sv.find('<');
+        if constexpr (lt == std::string_view::npos)
+        {
+            return T;
+        }
+        else
+        {
+            return substr<T, 0, lt>();
+        }
+    }
+
+    template <typename T>
+    struct refl_cache
+    {
+        static constexpr auto name = str_name_dispatch<T>::name();
+        static constexpr auto name_sv = nil::xalt::literal_sv<name>;
+
+        static constexpr auto index = str_name_index<name>();
+
+        static constexpr auto short_name = substr<name, index>();
+        static constexpr auto short_name_sv = nil::xalt::literal_sv<short_name>;
+
+        static constexpr auto scope_name = substr<name, 0, index - (index > 2UL ? 2UL : 0UL)>();
+        static constexpr auto scope_name_sv = nil::xalt::literal_sv<scope_name>;
+
+        static constexpr auto base_name = short_base_name_of<short_name>();
+        static constexpr auto base_name_sv = nil::xalt::literal_sv<base_name>;
+    };
 }
 
 namespace nil::xalt
 {
     template <typename T>
-    consteval auto str_name()
+    constexpr const auto& str_name()
     {
-        return detail::str_name_dispatch<T>::name();
+        return detail::refl_cache<T>::name;
     }
 
     template <typename T>
-    consteval auto str_short_name()
+    constexpr const auto& str_short_name()
     {
-        constexpr auto name = str_name<T>();
-        static_assert(!starts_with<name, "(">());
-        return substr<name, detail::str_name_index<name>()>();
+        return detail::refl_cache<T>::short_name;
     }
 
     template <typename T>
-    consteval auto str_scope_name()
+    constexpr const auto& str_scope_name()
     {
-        constexpr auto name = str_name<T>();
-        static_assert(!starts_with<name, "(">());
-        constexpr auto index = detail::str_name_index<name>();
-        return substr<name, 0, index - (index > 2UL ? 2UL : 0UL)>();
+        return detail::refl_cache<T>::scope_name;
     }
 
     template <typename T>
-    inline constexpr const auto& str_name_v = literal_v<str_name<T>()>;
+    constexpr const auto& str_short_base_name()
+    {
+        return detail::refl_cache<T>::base_name;
+    }
 
     template <typename T>
-    inline constexpr const auto& str_name_sv = literal_sv<str_name<T>()>;
+    inline constexpr const auto& str_name_v = literal_v<detail::refl_cache<T>::name>;
 
     template <typename T>
-    inline constexpr const auto& str_short_name_v = literal_v<str_short_name<T>()>;
+    inline constexpr const auto& str_name_sv = literal_sv<detail::refl_cache<T>::name>;
 
     template <typename T>
-    inline constexpr const auto& str_short_name_sv = literal_sv<str_short_name<T>()>;
+    inline constexpr const auto& str_short_name_v = literal_v<detail::refl_cache<T>::short_name>;
 
     template <typename T>
-    inline constexpr const auto& str_scope_name_v = literal_v<str_scope_name<T>()>;
+    inline constexpr const auto& str_short_name_sv = detail::refl_cache<T>::short_name_sv;
 
     template <typename T>
-    inline constexpr const auto& str_scope_name_sv = literal_sv<str_scope_name<T>()>;
+    inline constexpr const auto& str_scope_name_v = literal_v<detail::refl_cache<T>::scope_name>;
+
+    template <typename T>
+    inline constexpr const auto& str_scope_name_sv = detail::refl_cache<T>::scope_name_sv;
+
+    template <typename T>
+    inline constexpr const auto& str_short_base_name_v
+        = nil::xalt::literal_v<detail::refl_cache<T>::base_name>;
+
+    template <typename T>
+    inline constexpr const auto& str_short_base_name_sv = detail::refl_cache<T>::base_name_sv;
 }

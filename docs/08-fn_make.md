@@ -2,9 +2,11 @@
 
 Smart constructor utilities that attempt multiple constructor overloads with different argument combinations.
 
+Includes: `#include <nil/xalt/fn_make.hpp>`
+
 ## Overview
 
-`fn_make` provides functions that try to construct objects by testing different combinations of provided arguments, automatically finding the best matching constructor.
+`fn_make` provides functions that try to construct objects by testing different subsets of provided arguments.
 
 ## nil::xalt::fn_make
 
@@ -49,11 +51,11 @@ auto ptr = fn_make_shared<MyClass>(42, "hello", true, 3.14);
 
 ## How It Works
 
-The algorithm uses bit masking to try different combinations:
-1. Start with all provided arguments
-2. If no constructor matches, remove the last argument and try again  
-3. Continue until a valid constructor is found
-4. Uses compile-time argument filtering to test combinations efficiently
+The algorithm uses bit masking to try different subsets:
+1. Start from the full argument set.
+2. Scan subsets in descending mask order.
+3. For each subset, probe constructibility with `implicit_cast`.
+4. Construct with original forwarded arguments for the first successful subset.
 
 ## Dependencies
 
@@ -65,5 +67,5 @@ The algorithm uses bit masking to try different combinations:
 
 - All operations are performed at compile-time where possible
 - Throws compilation error if no valid constructor can be found
-- Arguments are tested in reverse order (last arguments removed first)
+- Subset preference follows descending mask order
 - Useful for generic factory functions and forwarding constructors

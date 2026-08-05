@@ -2,6 +2,8 @@
 
 Contains utility templates that can be used for debugging.
 
+Includes: `#include <nil/xalt/errors.hpp>`
+
 ## nil::xalt::undefined
 
 A deleted template designed to cause a compilation failure. This failure allows the compiler to display the template's arguments for debugging.
@@ -14,3 +16,7 @@ int main()
     // will cause compilation error and print out the arguments
 }
 ```
+
+Notes:
+- Both type-parameter and non-type-parameter forms are provided.
+- Intended for deliberate diagnostic breakpoints in templates.

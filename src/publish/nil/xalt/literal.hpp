@@ -86,21 +86,17 @@ namespace nil::xalt
         return literal_sv<from>.ends_with(literal_sv<to_find>);
     }
 
-    template <literal base, literal from, literal to, std::size_t count>
-    consteval auto replace()
+    template <literal base, literal from, literal to>
+    consteval auto replace_one()
     {
+        static_assert(sizeof(from) > 1, "replace_one requires non-empty 'from' literal");
         if constexpr (constexpr auto index1 = find<base, from>(); index1 != sizeof(base))
         {
             constexpr auto index2 = index1 + sizeof(from) - 1;
             constexpr auto remaining_size = sizeof(base) - index2;
             constexpr auto section1 = substr<base, 0, index1>();
             constexpr auto section2 = substr<base, index2, remaining_size>();
-
-            if constexpr (count == 1) {
-                return concat<section1, to, section2>();
-            } else {
-                return concat<section1, to, replace<section2, from, to, count - 1>()>();
-            }
+            return concat<section1, to, section2>();
         }
         else
         {
@@ -109,15 +105,20 @@ namespace nil::xalt
     }
 
     template <literal base, literal from, literal to>
-    consteval auto replace_one()
-    {
-        return replace<base, from, to, 1>();
-    }
-
-
-    template <literal base, literal from, literal to>
     consteval auto replace_all()
     {
-        return replace<base, from, to, 0xFFFFFFFF>();
+        static_assert(sizeof(from) > 1, "replace_all requires non-empty 'from' literal");
+        if constexpr (constexpr auto index1 = find<base, from>(); index1 != sizeof(base))
+        {
+            constexpr auto index2 = index1 + sizeof(from) - 1;
+            constexpr auto remaining_size = sizeof(base) - index2;
+            constexpr auto section1 = substr<base, 0, index1>();
+            constexpr auto section2 = substr<base, index2, remaining_size>();
+            return concat<section1, to, replace_all<section2, from, to>()>();
+        }
+        else
+        {
+            return base;
+        }
     }
 }

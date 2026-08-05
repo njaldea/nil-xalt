@@ -2,6 +2,8 @@
 
 Provides compile-time utilities to extract the string representation of types and constant values.
 
+Includes: `#include <nil/xalt/str_name.hpp>`
+
 ```cpp
 namespace Namespace
 {
@@ -60,6 +62,17 @@ int main()
 }
 ```
 
+## nil::xalt::str_short_base_name
+
+Returns the short type name without scope and without template arguments.
+
+```cpp
+using T = Namespace::Class::Vector<int>;
+
+static_assert(nil::xalt::str_short_name_sv<T> == "Vector<int>");
+static_assert(nil::xalt::str_short_base_name_sv<T> == "Vector");
+```
+
 ## typify
 
 When using [typify](./10-typed.md#nilxalttypify), the str_name functions will extract the underlying value:
@@ -68,6 +81,7 @@ When using [typify](./10-typed.md#nilxalttypify), the str_name functions will ex
 static_assert(str_name_sv<typify<Status::Active>> == "Status::Active");
 static_assert(str_short_name_sv<typify<Status::Active>> == "Active");
 static_assert(str_scope_name_sv<typify<Status::Active>> == "Status");
+static_assert(str_short_base_name_sv<typify<Status::Active>> == "Active");
 
 // Integer values
 static_assert(str_name_sv<typify<42>> == "42");
@@ -96,3 +110,17 @@ If the compiler doesn't support these intrinsics, the functions will not be avai
 - The output format may vary slightly between different compilers
 - Template parameters in type names are fully expanded
 - Nested class names include their containing scope
+
+## Compile-Time Benchmark
+
+Use the benchmark sandbox target and helper script to compare compile-time changes over multiple runs:
+
+```bash
+./configure/bench_str_name -n 5
+```
+
+The script rebuilds `sandbox_str_name_bench` repeatedly and writes a markdown report to:
+
+```text
+.build/reports/str_name_bench_report.md
+```

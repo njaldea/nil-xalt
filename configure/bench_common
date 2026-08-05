@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+
+if [[ $0 != $BASH_SOURCE ]]; then
+    echo "do not source this script"
+    return 1
+fi
+
+set -euo pipefail
+
+SCRIPT_PATH=$(dirname "$BASH_SOURCE")
+REPO_PATH=$(realpath "$SCRIPT_PATH/..")
+BUILD_DIR="$REPO_PATH/.build"
+ITERATIONS=5
+
+usage()
+{
+    echo "Usage: $1 --title TITLE --target TARGET --report REPORT_PATH [-n iterations]"
+    echo "options:"
+    echo "n         Number of benchmark runs (default: 5)"
+    echo "h         Print this help"
+}
+
+run_bench()
+{
+    local title="$1"
+    local target="$2"
+    local report_path="$3"
+
+    local report_dir
+    report_dir=$(dirname "$report_path")
+
+    now_ms()
+    {
+        date +%s%3N
+    }
+
+    mkdir -p "$report_dir"
+
+    cmake -S "$REPO_PATH" -B "$BUILD_DIR" -DENABLE_SANDBOX=ON >/dev/null
+
+    local sum_ms=0
+    local min_ms=0
+    local max_ms=0
+    local run_lines=""
+
+    for i in $(seq 1 "$ITERATIONS"); do
+        rm -f \
+            "$BUILD_DIR/bin/${target}" \
+            "$BUILD_DIR/sandbox/CMakeFiles/${target}.dir"/*.o \
+            "$BUILD_DIR/sandbox/CMakeFiles/${target}.dir"/*.o.d
+
+        local start_ms
+        local end_ms
+        local elapsed_ms
+
+        start_ms=$(now_ms)
+        cmake --build "$BUILD_DIR" --target "$target" -j >/dev/null
+        end_ms=$(now_ms)
+
+        elapsed_ms=$((end_ms - start_ms))
+        sum_ms=$((sum_ms + elapsed_ms))
+
+        if [[ "$i" -eq 1 ]] || [[ "$elapsed_ms" -lt "$min_ms" ]]; then
+            min_ms=$elapsed_ms
+        fi
+        if [[ "$i" -eq 1 ]] || [[ "$elapsed_ms" -gt "$max_ms" ]]; then
+            max_ms=$elapsed_ms
+        fi
+
+        run_lines+="- run ${i}: ${elapsed_ms} ms\\n"
+        echo "run ${i}/${ITERATIONS}: ${elapsed_ms} ms"
+    done
+
+    local avg_ms
+    avg_ms=$((sum_ms / ITERATIONS))
+
+    {
+        echo "# ${title}"
+        echo
+        echo "- timestamp: $(date -Iseconds)"
+        echo "- target: ${target}"
+        echo "- iterations: ${ITERATIONS}"
+        echo "- build_dir: ${BUILD_DIR}"
+        echo
+        echo "## runs"
+        echo
+        printf "%b" "$run_lines"
+        echo
+        echo "## summary"
+        echo
+        echo "- min: ${min_ms} ms"
+        echo "- max: ${max_ms} ms"
+        echo "- avg: ${avg_ms} ms"
+    } > "$report_path"
+
+    echo "report written to ${report_path}"
+}
+
+TITLE=""
+TARGET=""
+REPORT_PATH=""
+
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --title)
+            TITLE="$2"
+            shift 2
+            ;;
+        --target)
+            TARGET="$2"
+            shift 2
+            ;;
+        --report)
+            REPORT_PATH="$2"
+            shift 2
+            ;;
+        -n)
+            ITERATIONS="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage "$(basename "$0")"
+            exit 0
+            ;;
+        *)
+            echo "unknown option is provided: $1"
+            usage "$(basename "$0")"
+            exit 1
+            ;;
+    esac
+done
+
+if [[ -z "$TITLE" ]] || [[ -z "$TARGET" ]] || [[ -z "$REPORT_PATH" ]]; then
+    echo "title, target, and report are required"
+    usage "$(basename "$0")"
+    exit 1
+fi
+
+if ! [[ "$ITERATIONS" =~ ^[0-9]+$ ]] || [[ "$ITERATIONS" -lt 1 ]]; then
+    echo "iterations must be a positive integer"
+    exit 1
+fi
+
+run_bench "$TITLE" "$TARGET" "$REPORT_PATH"

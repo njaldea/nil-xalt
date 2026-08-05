@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+if [[ $0 != $BASH_SOURCE ]]; then
+    echo "do not source this script"
+    return 1
+fi
+
+set -euo pipefail
+
+SCRIPT_PATH=$(dirname "$BASH_SOURCE")
+REPO_PATH=$(realpath "$SCRIPT_PATH/..")
+TARGET="sandbox_str_name_bench"
+REPORT_PATH="$REPO_PATH/.build/reports/str_name_bench_report.md"
+TITLE="str_name compile-time benchmark"
+COMMON_SCRIPT="$SCRIPT_PATH/bench_common"
+
+exec "$COMMON_SCRIPT" \
+    --title "$TITLE" \
+    --target "$TARGET" \
+    --report "$REPORT_PATH" \
+    "$@"

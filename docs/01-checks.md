@@ -1,6 +1,8 @@
 # checks
 
-Contains utility templates for checking truthy-ness
+Contains utility templates for template-shape checks.
+
+Includes: `#include <nil/xalt/checks.hpp>`
 
 ## nil::xalt::is_of_template
 
@@ -23,3 +25,7 @@ int main()
     static_assert(!nil::xalt::is_of_template_v<S, std::tuple>);
 };
 ```
+
+Notes:
+- `is_of_template_v<T, U>` is a concept and can be used in `requires` clauses.
+- `U` must be a template of the form `template <typename...> typename U`.

@@ -2,11 +2,13 @@
 
 Contains utility templates to stringify enums.
 
-| Trait                     | Purpose                                 | Example                                     |
-|---------------------------|-----------------------------------------|---------------------------------------------|
-| `str_enum_start<T>`       | Customize the first enum to inspect     | `ABC::A`                                    |
-| `str_enum_values<T>`      | Override enum value scanning entirely   | `tlist<typify<ABC::A>, typify<ABC::B>>`     |
-| `str_enum(T)`             | Get string name or `"-"` fallback       | `"ABC::B"`                                  |
+Includes: `#include <nil/xalt/str_enum.hpp>`
+
+| Trait | Purpose | Example |
+|---|---|---|
+| `str_enum_start<T>` | Customize the first enum to inspect | `ABC::A` |
+| `str_enum_values<T>` | Override enum value scanning entirely | `tlist<typify<ABC::A>, typify<ABC::B>>` |
+| `str_enum(T)` | Get string name or `"-"` fallback | `"ABC::B"` |
 
 ## nil::xalt::str_enum
 
@@ -51,6 +53,10 @@ There are two types of enums, *counting* and *masking*.
 *masking* enum considers 0 as an invalid value.
 
 If the value can be converted into the target enum type and matches a known enumerator name, it is considered valid.
+
+Search order note:
+- The implementation scans from `str_enum_start_v<T>` and uses `+1` for counting enums or `<< 1` for masking enums.
+- It stops on the first invalid next candidate.
 
 ## nil::xalt::str_short_enum
 
@@ -103,3 +109,17 @@ struct nil::xalt::str_enum_values<ABC>
 - [tlist](./03-tlist.md)
 - [literal](./02-literal.md)
 - [str_name](./04-str_name.md)
+
+## Compile-Time Benchmark
+
+Use the benchmark sandbox target and helper script to compare compile-time changes over multiple runs:
+
+```bash
+./configure/bench_str_enum -n 5
+```
+
+The script rebuilds `sandbox_str_enum_bench` repeatedly and writes a markdown report to:
+
+```text
+.build/reports/str_enum_bench_report.md
+```

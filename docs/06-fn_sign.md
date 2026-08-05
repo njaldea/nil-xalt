@@ -1,5 +1,7 @@
 # fn_sign
 
+Includes: `#include <nil/xalt/fn_sign.hpp>`
+
 ## nil::xalt::fn_sign
 
 ```cpp
@@ -48,3 +50,7 @@ static_assert(F1::is_noexcept && F2::is_noexcept);
 ## Dependencies
 
 - [tlist](./03-tlist.md)
+
+## Related
+
+- `is_fn<T>`: checks whether `fn_sign<T>` is available.
