@@ -105,7 +105,7 @@ int main()
     std::cout << str_name_sv<typify<Zip(100)>> << std::endl;
 
     using t1 = tlist<int, bool, char>;
-    using t2 = tlist<>::join<tlist<int>, tlist<bool>, tlist<char>>;
+    using t2 = tlist_join_t<tlist<int>, tlist<bool>, tlist<char>>;
     static_assert(std::is_same_v<t1, t2>);
     // std::cout << nil::xalt::str_enum(Zip::DEF) << std::endl;
 

@@ -26,18 +26,6 @@ namespace nil::xalt
         using type = First;
     };
 
-    template <typename I, typename O, template <typename, typename...> typename C, typename... T>
-    struct tlist_remove_if;
-
-    template <typename T>
-    struct tlist_dedupe;
-
-    template <typename... T>
-    struct tlist_join;
-
-    template <typename I, typename O>
-    struct tlist_dedupe_impl;
-
     template <typename... T>
     struct tlist final
     {
@@ -54,18 +42,13 @@ namespace nil::xalt
         using apply_t = tlist<typename U<T, C...>::type...>;
 
         template <template <typename, typename...> typename P, typename... C>
-        using remove_if = typename tlist_remove_if<tlist<T...>, tlist<>, P, C...>::type;
-
-        template <typename... U>
-        using join = typename tlist_join<tlist<T...>, U...>::type;
-
-        using dedupe = typename tlist_dedupe<tlist<T...>>::type;
-
-        template <template <typename, typename...> typename P, typename... C>
         static constexpr auto any_of = (P<T, C...>::value || ... || false);
 
         template <template <typename, typename...> typename P, typename... C>
         static constexpr auto all_of = (P<T, C...>::value && ... && true);
+
+        template <typename U>
+        static constexpr auto contains = any_of<std::is_same, U>;
 
         static constexpr auto size = sizeof...(T);
 
@@ -73,6 +56,8 @@ namespace nil::xalt
             requires(size > I)
         using at = typename tlist_at<I, T...>::type;
     };
+
+    // to tlist
 
     template <typename T>
     struct to_tlist;
@@ -92,14 +77,10 @@ namespace nil::xalt
     template <typename T>
     using to_tlist_t = typename to_tlist<T>::type;
 
-    template <typename... T>
-    struct tlist_dedupe<tlist<T...>> final
-    {
-        using type = typename tlist_dedupe_impl<tlist<T...>, tlist<>>::type;
-    };
+    // remove_if
 
-    template <typename T>
-    using tlist_dedupe_t = typename tlist_dedupe<T>::type;
+    template <typename I, typename O, template <typename, typename...> typename C, typename... T>
+    struct tlist_remove_if_impl;
 
     template <
         typename IA,
@@ -108,19 +89,36 @@ namespace nil::xalt
         template <typename, typename...>
         typename C,
         typename... T>
-    struct tlist_remove_if<tlist<IA, I...>, tlist<O...>, C, T...> final
+    struct tlist_remove_if_impl<tlist<IA, I...>, tlist<O...>, C, T...> final
     {
         using type = std::conditional_t<
             C<IA, T...>::value,
-            typename tlist_remove_if<tlist<I...>, tlist<O...>, C, T...>::type,
-            typename tlist_remove_if<tlist<I...>, tlist<O..., IA>, C, T...>::type>;
+            typename tlist_remove_if_impl<tlist<I...>, tlist<O...>, C, T...>::type,
+            typename tlist_remove_if_impl<tlist<I...>, tlist<O..., IA>, C, T...>::type>;
     };
 
     template <typename... O, template <typename, typename...> typename C, typename... T>
-    struct tlist_remove_if<tlist<>, tlist<O...>, C, T...> final
+    struct tlist_remove_if_impl<tlist<>, tlist<O...>, C, T...> final
     {
         using type = tlist<O...>;
     };
+
+    template <typename I, template <typename, typename...> typename C, typename... T>
+    struct tlist_remove_if final
+    {
+        using type = typename tlist_remove_if_impl<I, tlist<>, C, T...>::type;
+    };
+
+    template <typename I, template <typename, typename...> typename C, typename... T>
+    using tlist_remove_if_t = typename tlist_remove_if<I, C, T...>::type;
+
+    // dedupe
+
+    template <typename T>
+    struct tlist_dedupe;
+
+    template <typename I, typename O>
+    struct tlist_dedupe_impl;
 
     template <typename IA, typename... I, typename... O>
     struct tlist_dedupe_impl<tlist<IA, I...>, tlist<O...>> final
@@ -137,6 +135,20 @@ namespace nil::xalt
         using type = tlist<O...>;
     };
 
+    template <typename... T>
+    struct tlist_dedupe<tlist<T...>> final
+    {
+        using type = typename tlist_dedupe_impl<tlist<T...>, tlist<>>::type;
+    };
+
+    template <typename T>
+    using tlist_dedupe_t = typename tlist_dedupe<T>::type;
+
+    // join
+
+    template <typename... T>
+    struct tlist_join;
+
     template <typename... T1, typename... T2, typename... T>
     struct tlist_join<tlist<T1...>, tlist<T2...>, T...> final
     {
@@ -148,4 +160,13 @@ namespace nil::xalt
     {
         using type = tlist<T1...>;
     };
+
+    template <>
+    struct tlist_join<> final
+    {
+        using type = tlist<>;
+    };
+
+    template <typename... T>
+    using tlist_join_t = typename tlist_join<T...>::type;
 }

@@ -28,21 +28,24 @@ TEST(tlist, types)
     {
         static_assert(!type::any_of<std::is_same, float>);
         static_assert(type::any_of<std::is_same, bool>);
+        static_assert(!type::contains<float>);
+        static_assert(type::contains<bool>);
     }
     {
-        using filtered_1 = type::remove_if<std::is_same, float>;
+        static_assert(!tlist<>::contains<int>);
+    }
+    {
+        using filtered_1 = nil::xalt::tlist_remove_if_t<type, std::is_same, float>;
         static_assert(std::is_same_v<filtered_1, tlist<int, bool>>);
 
-        using filtered_2 = type::remove_if<std::is_same, bool>;
+        using filtered_2 = nil::xalt::tlist_remove_if_t<type, std::is_same, bool>;
         static_assert(std::is_same_v<filtered_2, tlist<int>>);
     }
     {
         using duplicates = tlist<int, bool, int, float, bool, int>;
-        using dedupe_1 = duplicates::dedupe;
-        using dedupe_2 = tlist_dedupe_t<duplicates>;
+        using dedupe = tlist_dedupe_t<duplicates>;
         using expected = tlist<int, bool, float>;
 
-        static_assert(std::is_same_v<dedupe_1, expected>);
-        static_assert(std::is_same_v<dedupe_2, expected>);
+        static_assert(std::is_same_v<dedupe, expected>);
     }
 }

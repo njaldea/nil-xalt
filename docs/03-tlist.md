@@ -21,12 +21,20 @@ The `tlist` class provides the following categories of operations:
 |---|---|
 | `cast<U>` | Rebind contained types into `U<T...>`. |
 | `cast_t<U>` | Rebind then read `::type` from the result. |
-| `apply<U, C...>` | Map each type through `U<T, C...>`. |
-| `apply_t<U, C...>` | Map each type through `typename U<T, C...>::type`. |
-| `remove_if<P, C...>` | Filter out types where `P<T, C...>::value` is `true`. |
-| `join<U...>` | Concatenate with one or more `tlist<...>` lists. |
-| `dedupe` | Remove duplicate types, preserving first occurrence order. |
+| `apply<U, C...>` | Map each type through `U<T, C...>`. `U` must take at least one type parameter. |
+| `apply_t<U, C...>` | Map each type through `typename U<T, C...>::type`. `U` must take at least one type parameter. |
+| `any_of<P, C...>` | Check whether any type satisfies `P<T, C...>::value`. |
+| `all_of<P, C...>` | Check whether every type satisfies `P<T, C...>::value`. |
+| `contains<U>` | Check whether `U` occurs in the list. |
 | `at<I>` | Type at index `I` (bounds-checked). |
+
+The following free utilities operate on `tlist` types:
+
+| Utility | Description |
+|---|---|
+| `tlist_remove_if_t<I, P, C...>` | Filter out types where `P<T, C...>::value` is `true`. The output list defaults to empty internally. |
+| `tlist_join_t<L...>` | Concatenate `tlist<...>` types. |
+| `tlist_dedupe_t<L>` | Remove duplicate types, preserving first occurrence order. |
 
 ### Type Transformations
 - `cast` - Convert the type list to another template (e.g., `std::tuple`)
@@ -47,20 +55,24 @@ using ptrs2 = my_types::apply_t<std::add_pointer>;  // tlist<int*, bool*, float*
 
 ### Properties
 - `size` - Number of types in the list
+- `contains<U>` - Check if the list contains type `U`
 - `at<I>` - Access type at index I (bounds-checked)
 
 ```cpp
 using my_types = tlist<int, bool, float>;
 static_assert(my_types::size == 3);
+static_assert(my_types::contains<float>);
 using first_type = my_types::at<0>;  // int
 ```
 
 ### Operations
 - `any_of` - Check if any type satisfies a predicate (false when empty)
 - `all_of` - Check if all types satisfy a predicate (true when empty)
-- `remove_if` - Create new list without types matching predicate
-- `join` - Concatenate one or more `tlist<...>` types
-- `dedupe` - Remove duplicate types (keep first occurrence)
+- `contains` - Check whether a type occurs in the list
+- `at` - Access a type by index
+
+Filtering, joining, and deduplication are provided by the free utilities
+`tlist_remove_if_t`, `tlist_join_t`, and `tlist_dedupe_t` described above.
 
 ```cpp
 using my_types = tlist<int, float, bool>;
@@ -69,31 +81,31 @@ using my_types = tlist<int, float, bool>;
 static_assert(my_types::any_of<std::is_floating_point>);
 static_assert(!my_types::all_of<std::is_floating_point>);
 
-// Remove floating point types
+// Remove floating point types with the free utility
 template <typename T>
 struct is_floating_point { static constexpr bool value = std::is_floating_point_v<T>; };
 
-using non_floats = my_types::remove_if<is_floating_point>;  // tlist<int, bool>
+using non_floats = tlist_remove_if_t<my_types, is_floating_point>;  // tlist<int, bool>
 
-// Join with another list
+// Join lists with the free utility
 using more = tlist<char, long>;
-using all = my_types::join<more>; // tlist<int, float, bool, char, long>
+using all = tlist_join_t<my_types, more>; // tlist<int, float, bool, char, long>
 
-// Deduplicate by first appearance
+// Deduplicate by first appearance with the free utility
 using with_dups = tlist<int, bool, int, float, bool>;
-using dedup = with_dups::dedupe; // tlist<int, bool, float>
+using dedup = tlist_dedupe_t<with_dups>; // tlist<int, bool, float>
 
 // Predicates may take extra parameters via the C... pack
 static_assert(my_types::any_of<std::is_same, int>);
-using without_float = my_types::remove_if<std::is_same, float>; // tlist<int, bool>
+using without_float = tlist_remove_if_t<my_types, std::is_same, float>; // tlist<int, bool>
 ```
 
 Behavior notes:
-- `remove_if` preserves the original order of retained types.
-- `join` expects `tlist<...>` arguments (not arbitrary templates).
+- `tlist_remove_if_t` preserves the original order of retained types.
+- `tlist_join_t` expects `tlist<...>` arguments (not arbitrary templates).
 - `at<I>` is bounds-checked and currently implemented recursively.
 - `apply` expects a template that yields a type directly; `apply_t` expects a template with nested `::type`.
-- `dedupe` preserves order and keeps the first instance of each type.
+- `tlist_dedupe_t` preserves order and keeps the first instance of each type.
 
 ### Type Conversion
 Helper types for converting other templates to `tlist`:
@@ -104,7 +116,10 @@ Helper types for converting other templates to `tlist`:
 ```cpp
 // Convert from other templates
 using from_tuple = to_tlist_t<std::tuple<int, float, bool>>;  // tlist<int, float, bool>
-using from_seq = to_tlist_t<std::index_sequence<1,2,3>>;      // tlist<typify<1>, typify<2>, typify<3>>
+using from_seq = to_tlist_t<std::index_sequence<1, 2, 3>>;    // tlist<typify<1>, typify<2>, typify<3>>
+
+// std::make_index_sequence<N> is an integer_sequence, so it is converted too
+using indices = to_tlist_t<std::make_index_sequence<3>>;     // tlist<typify<0>, typify<1>, typify<2>>
 ```
 
 ## Predicates

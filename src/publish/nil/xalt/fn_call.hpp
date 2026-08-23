@@ -52,10 +52,11 @@ namespace nil::xalt::detail
         template <std::size_t M>
         static auto apply(Args... args)
         {
-            using masked_type //
-                = typename xalt::to_tlist_t<std::make_index_sequence<sizeof...(Args)>>::
-                    template apply_t<inverse, typify<sizeof...(Args)>>::
-                        template remove_if<not_hit, typify<M>>;
+            using masked_type = xalt::tlist_remove_if_t<
+                typename xalt::to_tlist_t<std::make_index_sequence<sizeof...(Args)>>::
+                    template apply_t<inverse, typify<sizeof...(Args)>>,
+                not_hit,
+                typify<M>>;
 
             if constexpr (check(masked_type()))
             {
