@@ -7,7 +7,7 @@
 namespace nil::xalt
 {
     template <typename A, typename... T>
-    concept fn_is_maker = requires() { A(std::declval<xalt::implicit_cast<T>>()...); };
+    concept fn_is_maker = requires(xalt::implicit_cast<T>... args) { A(args...); };
 
     template <typename A>
     struct fn_strategy final

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <type_traits>
 
 namespace nil::xalt
@@ -44,7 +45,10 @@ namespace nil::xalt
 
         ~implicit_cast() noexcept = default;
 
+        // blocks silent POD conversions (e.g. int -> float); class targets fall
+        // through to operator T() so they can still be constructed from T.
         template <typename U>
+            requires(!std::same_as<U, T> && !std::is_class_v<U>)
         operator U() const = delete;
 
         operator T() const // NOLINT(hicpp-explicit-conversions))

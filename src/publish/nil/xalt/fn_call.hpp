@@ -11,30 +11,6 @@
 
 namespace nil::xalt::detail
 {
-    template <std::size_t value>
-    consteval auto make_mask() -> std::size_t
-    {
-        return value == 0 ? 0 : (std::size_t(1) << (value)) - 1;
-    }
-
-    template <typename L, typename R>
-    struct not_hit;
-
-    template <auto V, auto M>
-    struct not_hit<typify<V>, typify<M>> final
-    {
-        static constexpr auto value = ((std::size_t(1) << V) & M) == 0;
-    };
-
-    template <typename L, typename R>
-    struct inverse;
-
-    template <auto V, auto M>
-    struct inverse<typify<V>, typify<M>> final
-    {
-        using type = typify<M - 1 - V>;
-    };
-
     struct invalid final
     {
     };
@@ -45,45 +21,52 @@ namespace nil::xalt::detail
     public:
         static auto call(Args... args)
         {
-            return apply<detail::make_mask<sizeof...(Args)>()>(std::forward<Args>(args)...);
+            return select<0>(std::forward<Args>(args)...);
         }
 
     private:
-        template <std::size_t M>
-        static auto apply(Args... args)
+        template <std::size_t Next, std::size_t... I>
+        static auto select(Args... args)
         {
-            using masked_type = xalt::tlist_remove_if_t<
-                typename xalt::to_tlist_t<std::make_index_sequence<sizeof...(Args)>>::
-                    template apply_t<inverse, typify<sizeof...(Args)>>,
-                not_hit,
-                typify<M>>;
-
-            if constexpr (check(masked_type()))
+            if constexpr (Next == sizeof...(Args))
             {
-                return call(masked_type(), std::forward<Args>(args)...);
-            }
-            else if constexpr (M > 0)
-            {
-                return apply<M - 1>(std::forward<Args>(args)...);
+                if constexpr (check(tlist<typify<I>...>()))
+                {
+                    return call(tlist<typify<I>...>(), std::forward<Args>(args)...);
+                }
+                else
+                {
+                    return invalid();
+                }
             }
             else
             {
-                return invalid();
-            }
-        }
+                using selected_type
+                    = decltype(select<Next + 1, I..., Next>(std::forward<Args>(args)...));
 
-        template <std::size_t... I>
-        static constexpr auto check(tlist<typify<I>...> /* i */)
-        {
-            using arg_list = tlist<Args...>;
-            return A::template check<typename arg_list::template at<sizeof...(Args) - I - 1>...>;
+                if constexpr (!std::is_same_v<selected_type, invalid>)
+                {
+                    return select<Next + 1, I..., Next>(std::forward<Args>(args)...);
+                }
+                else
+                {
+                    return select<Next + 1, I...>(std::forward<Args>(args)...);
+                }
+            }
         }
 
         template <std::size_t... I>
         static auto call(tlist<typify<I>...> /* i */, Args... args)
         {
             const auto t = std::make_tuple(explicit_cast<Args>{&args}...);
-            return A::call(std::get<sizeof...(Args) - I - 1>(t).cast()...);
+            return A::call(std::get<I>(t).cast()...);
+        }
+
+        template <std::size_t... I>
+        static constexpr auto check(tlist<typify<I>...> /* i */)
+        {
+            using arg_list = tlist<Args...>;
+            return A::template check<typename arg_list::template at<I>...>;
         }
     };
 

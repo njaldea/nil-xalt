@@ -87,6 +87,17 @@ struct Woof
     }
 };
 
+struct A
+{
+    A(auto a, float b, float c)
+    {
+        static_assert(std::is_same_v<decltype(a), bool>);
+        static_assert(std::is_same_v<decltype(b), float>);
+        static_assert(std::is_same_v<decltype(c), float>);
+        std::cout << a << ":" << b << ":" << c << std::endl;
+    }
+};
+
 int main()
 {
     using namespace nil::xalt;
@@ -130,8 +141,9 @@ int main()
     {
         using namespace nil::xalt;
         using namespace nil::xalt::detail;
-        using C = nil::xalt::noisy_type<"C", int, float>;
-        nil::xalt::fn_make<C>(false, 30, 0.2F, 20, 0.3F);
+        // using C = nil::xalt::noisy_type<"C", int, float>;
+
+        nil::xalt::fn_make<A>(false, 30, 0.2F, 20, 0.3F);
         const auto result
             = nil::xalt::fn_call(+[](bool v) { return v ? 11 : 10; }, 1, false, 'b', true);
         std::cout << "abc: " << result << std::endl;
