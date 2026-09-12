@@ -1,3 +1,6 @@
+// Copyright (c) 2026, Neil Aldea <njaldea@gmail.com>
+// SPDX-License-Identifier: BSL-1.0
+
 #include <cstdint>
 #include <nil/xalt/str_name.hpp>
 #include <nil/xalt/typed.hpp>

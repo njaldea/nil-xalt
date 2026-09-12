@@ -1,3 +1,6 @@
+// Copyright (c) 2026, Neil Aldea <njaldea@gmail.com>
+// SPDX-License-Identifier: BSL-1.0
+
 #pragma once
 
 #if !defined(__clang__) && !defined(__GNUC__) && !defined(_MSC_VER)
