@@ -13,6 +13,7 @@ set(
         publish/nil/xalt/noisy_type.hpp
         publish/nil/xalt/str_name.hpp
         publish/nil/xalt/str_enum.hpp
+        publish/nil/xalt/tagged_union.hpp
         publish/nil/xalt/tlist.hpp
         publish/nil/xalt/typed.hpp
         publish/nil/xalt/transparent_stl.hpp

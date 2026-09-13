@@ -3,6 +3,7 @@ add_test_executable(
     literal.cpp
     str_enum.cpp
     str_name.cpp
+    tagged_union.cpp
     tlist.cpp
 )
 
